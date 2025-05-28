@@ -13,11 +13,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -28,13 +32,22 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.se122.interactivelearning.R
 import com.se122.interactivelearning.ui.components.InputIcon
 import com.se122.interactivelearning.ui.components.PasswordInput
 import com.se122.interactivelearning.ui.components.PrimaryButton
+import androidx.compose.runtime.getValue
+import com.se122.interactivelearning.common.ViewState
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    viewModel: LoginViewModel = hiltViewModel(),
+    onLoginSuccess: () -> Unit
+) {
+    val loginState by viewModel.loginState.collectAsState()
+
     val usernameState = remember { mutableStateOf(TextFieldValue("")) }
     val passwordState = remember { mutableStateOf(TextFieldValue("")) }
     Column(
@@ -83,15 +96,39 @@ fun LoginScreen() {
             modifier = Modifier.align(Alignment.End),
         )
         PrimaryButton(
-            onClick = { /* Handle login button click */ },
+            onClick = {
+                viewModel.login(usernameState.value.text, passwordState.value.text)
+            },
             text = "Continue",
         )
+
+        when (loginState) {
+            is ViewState.Idle -> {}
+            is ViewState.Loading -> {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            is ViewState.Success -> {
+                LaunchedEffect(loginState) {
+                    onLoginSuccess()
+                }
+            }
+            is ViewState.Error -> {
+                val msg = (loginState as ViewState.Error).message ?: "Unknown error"
+                Text(msg, color = Color.Red, modifier = Modifier.padding(top = 8.dp))
+            }
+        }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(space = 20.dp, alignment = Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .weight(1f)
             )
@@ -100,7 +137,7 @@ fun LoginScreen() {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
             )
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .weight(1f)
             )
@@ -118,10 +155,4 @@ fun LoginScreen() {
             textAlign = TextAlign.Center
         )
     }
-}
-
-@Preview
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen()
 }

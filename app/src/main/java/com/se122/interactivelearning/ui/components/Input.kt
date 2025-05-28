@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,8 +42,8 @@ fun InputIcon(
             .fillMaxWidth()
             .border(
                 width = 1.dp,
+                shape = RoundedCornerShape(8.dp),
                 color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                shape = RoundedCornerShape(8.dp)
             )
             .padding(4.dp),
         placeholder = {
@@ -103,6 +104,7 @@ fun PasswordInput(
         isError = isError,
         singleLine = true,
         shape = RoundedCornerShape(8.dp),
+        visualTransformation = PasswordVisualTransformation()
     )
 }
 

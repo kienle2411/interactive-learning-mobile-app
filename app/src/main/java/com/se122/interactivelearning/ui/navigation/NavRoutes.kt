@@ -8,4 +8,5 @@ object NavRoutes {
     const val SEARCH = "search"
     const val LOGIN = "login"
     const val REGISTER = "register"
+    const val COURSE_DETAIL = "course_detail/{id}"
 }
