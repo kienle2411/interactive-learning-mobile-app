@@ -1,4 +1,4 @@
-package com.se122.interactivelearning.di
+package com.se122.interactivelearning.common.events
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

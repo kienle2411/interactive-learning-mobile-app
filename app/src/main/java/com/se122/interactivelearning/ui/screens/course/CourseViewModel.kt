@@ -1,18 +1,16 @@
 package com.se122.interactivelearning.ui.screens.course
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.se122.interactivelearning.common.ViewState
 import com.se122.interactivelearning.common.ViewState.Error
 import com.se122.interactivelearning.common.ViewState.Success
 import com.se122.interactivelearning.data.remote.api.ApiResult
-import com.se122.interactivelearning.data.remote.dto.ClassroomResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomStudentResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomWrapperResponse
-import com.se122.interactivelearning.domain.usecase.GetClassroomListUseCase
-import com.se122.interactivelearning.domain.usecase.JoinClassroomUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomListUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.JoinClassroomUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

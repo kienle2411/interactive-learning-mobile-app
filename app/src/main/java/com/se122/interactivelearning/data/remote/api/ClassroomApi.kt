@@ -2,7 +2,6 @@ package com.se122.interactivelearning.data.remote.api
 
 import com.se122.interactivelearning.data.remote.dto.AssignmentResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomDetailsResponse
-import com.se122.interactivelearning.data.remote.dto.ClassroomResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomStudentResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomWrapperResponse
 import com.se122.interactivelearning.data.remote.dto.MaterialResponse
@@ -30,7 +29,7 @@ interface ClassroomApi {
     @GET("classrooms/{id}/materials")
     suspend fun getClassroomMaterials(@Path("id") id: String): Response<ApiResponse<PaginationResponse<MaterialResponse>>>
 
-    @GET("classroom/{id}/meetings")
+    @GET("classrooms/{id}/meetings")
     suspend fun getClassroomMeetings(@Path("id") id: String): Response<ApiResponse<PaginationResponse<MeetingResponse>>>
 
     @GET("classrooms/{id}/assignments")

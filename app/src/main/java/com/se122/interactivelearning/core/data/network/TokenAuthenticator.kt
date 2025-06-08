@@ -1,9 +1,8 @@
-package com.se122.interactivelearning.data
+package com.se122.interactivelearning.core.data.network
 
 import android.util.Log
 import com.se122.interactivelearning.data.remote.api.AuthApi
-import com.se122.interactivelearning.data.remote.dto.RefreshRequest
-import com.se122.interactivelearning.di.LogoutEventBus
+import com.se122.interactivelearning.common.events.LogoutEventBus
 import com.se122.interactivelearning.utils.TokenManager
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
@@ -33,6 +32,7 @@ class TokenAuthenticator @Inject constructor(
         val accessToken = runBlocking { tokenManager.getAccessToken() }
 
         if (refreshToken.isNullOrBlank() || accessToken.isNullOrBlank()) {
+            Log.i("Empty", "AT RT")
             runBlocking {
                 logoutEventBus.sendLogoutEvent()
             }

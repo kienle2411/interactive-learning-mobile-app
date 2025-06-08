@@ -3,8 +3,8 @@ package com.se122.interactivelearning.utils
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import com.se122.interactivelearning.data.AuthPreferencesKeys
-import com.se122.interactivelearning.data.dataStore
+import com.se122.interactivelearning.core.data.datastore.AuthPreferencesKeys
+import com.se122.interactivelearning.core.data.datastore.dataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

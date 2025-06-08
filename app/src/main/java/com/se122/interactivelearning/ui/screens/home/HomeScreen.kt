@@ -22,6 +22,9 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
+import com.eygraber.compose.placeholder.PlaceholderHighlight
+import com.eygraber.compose.placeholder.material3.placeholder
+import com.eygraber.compose.placeholder.material3.shimmer
 import com.se122.interactivelearning.R
 import com.se122.interactivelearning.ui.theme.GrayPrimary
 
@@ -46,13 +49,26 @@ fun HomeScreen(
             AsyncImage(
                 model = user?.avatarUrl ?: R.drawable.img_avatar,
                 contentDescription = "avatar_image",
-                modifier = Modifier.size(40.dp).clip(RoundedCornerShape(40.dp)).border(width = 1.dp, color = GrayPrimary, shape = RoundedCornerShape(40.dp))
+                modifier = Modifier.size(40.dp).clip(RoundedCornerShape(40.dp)).border(width = 1.dp, color = GrayPrimary, shape = RoundedCornerShape(40.dp)).placeholder(
+                    visible = user == null,
+                    highlight = PlaceholderHighlight.shimmer()
+                )
             )
             Column {
-                Text(
-                    text = "Hello, ${user?.firstName} ${user?.lastName}",
-                    style = MaterialTheme.typography.titleLarge
-                )
+                Row {
+                    Text(
+                        text = "Hello, ",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        text = "${user?.firstName} ${user?.lastName}",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.placeholder(
+                            visible = user == null,
+                            highlight = PlaceholderHighlight.shimmer()
+                        )
+                    )
+                }
                 Text(
                     text = "Let's learn something new today!",
                     style = MaterialTheme.typography.bodyMedium
@@ -60,7 +76,12 @@ fun HomeScreen(
             }
         }
         Text(
-            text = "Upcoming Meeting",
+            text = "Upcoming Meetings",
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        Text(
+            text = "Upcoming Assignments",
             style = MaterialTheme.typography.titleMedium
         )
     }

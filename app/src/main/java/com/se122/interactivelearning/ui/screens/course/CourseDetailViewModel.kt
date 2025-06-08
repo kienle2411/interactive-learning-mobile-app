@@ -1,10 +1,6 @@
 package com.se122.interactivelearning.ui.screens.course
 
-import android.content.Context
-import android.content.Intent
 import android.util.Log
-import androidx.compose.runtime.collectAsState
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.se122.interactivelearning.common.ViewState
@@ -16,13 +12,13 @@ import com.se122.interactivelearning.data.remote.dto.ClassroomStudentResponse
 import com.se122.interactivelearning.data.remote.dto.MaterialResponse
 import com.se122.interactivelearning.data.remote.dto.MeetingResponse
 import com.se122.interactivelearning.data.remote.dto.SessionResponse
-import com.se122.interactivelearning.domain.usecase.GetClassroomAssignmentsUseCase
-import com.se122.interactivelearning.domain.usecase.GetClassroomDetailUseCase
-import com.se122.interactivelearning.domain.usecase.GetClassroomMaterialsUseCase
-import com.se122.interactivelearning.domain.usecase.GetClassroomMeetingUseCase
-import com.se122.interactivelearning.domain.usecase.GetClassroomSessionsUseCase
-import com.se122.interactivelearning.domain.usecase.GetClassroomStudentsUseCase
-import com.se122.interactivelearning.domain.usecase.GetFileDownloadLinkUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomAssignmentsUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomDetailUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomMaterialsUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomMeetingUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomSessionsUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomStudentsUseCase
+import com.se122.interactivelearning.domain.usecase.file.GetFileDownloadLinkUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

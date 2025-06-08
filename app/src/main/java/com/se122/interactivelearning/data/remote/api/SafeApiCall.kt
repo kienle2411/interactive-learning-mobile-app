@@ -1,6 +1,7 @@
 package com.se122.interactivelearning.data.remote.api
 
 import android.util.Log
+import com.google.gson.Gson
 import retrofit2.Response
 
 suspend fun <T> safeApiCall(apiCall: suspend () -> Response<ApiResponse<T>>): ApiResult<T> {
@@ -21,7 +22,7 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> Response<ApiResponse<T>>): Ap
         } else {
             Log.i("Response", "Response: ${response.errorBody().toString()}")
             val errorBody = response.errorBody()?.string()
-            val gson = com.google.gson.Gson()
+            val gson = Gson()
             val errorResponse = gson.fromJson(errorBody, ApiResponse::class.java)
             ApiResult.Error(
                 code = errorResponse?.statusCode?.toInt(),

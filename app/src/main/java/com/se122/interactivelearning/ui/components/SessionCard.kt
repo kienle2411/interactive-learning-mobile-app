@@ -49,9 +49,11 @@ fun SessionCard(
                 modifier = Modifier.fillMaxWidth().padding(10.dp),
                 horizontalArrangement = Arrangement.End
             ) {
-                Text(
-                    text = "Join"
-                )
+                Button(
+                    onClick = {}
+                ) {
+                    Text("Join")
+                }
             }
         }
     }

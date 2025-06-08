@@ -1,13 +1,15 @@
 package com.se122.interactivelearning.di
 
 import com.se122.interactivelearning.domain.repository.ClassroomRepository
-import com.se122.interactivelearning.domain.repository.ClassroomRepositoryImpl
+import com.se122.interactivelearning.data.repository.ClassroomRepositoryImpl
 import com.se122.interactivelearning.domain.repository.FileRepository
-import com.se122.interactivelearning.domain.repository.FileRepositoryImpl
+import com.se122.interactivelearning.data.repository.FileRepositoryImpl
 import com.se122.interactivelearning.domain.repository.LoginRepository
-import com.se122.interactivelearning.domain.repository.LoginRepositoryImpl
+import com.se122.interactivelearning.data.repository.LoginRepositoryImpl
 import com.se122.interactivelearning.domain.repository.MeetingRepository
-import com.se122.interactivelearning.domain.repository.MeetingRepositoryImpl
+import com.se122.interactivelearning.data.repository.MeetingRepositoryImpl
+import com.se122.interactivelearning.domain.repository.UserRepository
+import com.se122.interactivelearning.data.repository.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -40,4 +42,10 @@ abstract class RepositoryModule {
     abstract fun bindMeetingRepository(
         meetingRepositoryImpl: MeetingRepositoryImpl
     ): MeetingRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindUserRepository(
+        userRepositoryImpl: UserRepositoryImpl
+    ): UserRepository
 }

@@ -3,7 +3,6 @@ package com.se122.interactivelearning.data.remote.api
 import com.se122.interactivelearning.data.remote.dto.LoginRequest
 import com.se122.interactivelearning.data.remote.dto.LoginResponse
 import com.se122.interactivelearning.data.remote.dto.ProfileResponse
-import com.se122.interactivelearning.data.remote.dto.RefreshRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

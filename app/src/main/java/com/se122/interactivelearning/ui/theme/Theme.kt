@@ -16,7 +16,6 @@ private val DarkColorScheme = darkColorScheme(
     primary = GreenPrimary,
     secondary = Color.Green,
     tertiary = Color.Green,
-
     surface = GreenPrimary,
 )
 

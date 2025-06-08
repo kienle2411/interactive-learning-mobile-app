@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import com.se122.interactivelearning.common.ViewState
 import com.se122.interactivelearning.ui.components.ClassCard
@@ -84,7 +85,9 @@ fun CourseScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth().height(65.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(65.dp),
                 horizontalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 InputIcon(
@@ -94,7 +97,9 @@ fun CourseScreen(
                     },
                     placeholder = "Classroom Code",
                     leadingIcon = Icons.Default.Build,
-                    modifier = Modifier.weight(1f).fillMaxHeight()
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
                 )
                 PrimaryButton(
                     onClick = {
@@ -104,7 +109,9 @@ fun CourseScreen(
                         }
                     },
                     text = "Join",
-                    modifier = Modifier.weight(0.4f).fillMaxHeight()
+                    modifier = Modifier
+                        .weight(0.4f)
+                        .fillMaxHeight()
                 )
             }
 
@@ -159,7 +166,11 @@ fun CourseScreen(
         }
 
         if (joinState is ViewState.Loading) {
-            FullScreenLoading()
+            Dialog(
+                onDismissRequest = {}
+            ) {
+                CircularProgressIndicator()
+            }
         }
 
         if (showErrorDialog.value) {
@@ -167,7 +178,10 @@ fun CourseScreen(
                 onDismissRequest = {
                     showErrorDialog.value = false
                 },
-                modifier = Modifier.zIndex(1f).border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(5.dp)).background(MaterialTheme.colorScheme.background),
+                modifier = Modifier
+                    .zIndex(1f)
+                    .border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(5.dp))
+                    .background(MaterialTheme.colorScheme.background),
                 content = {
                     Box {
                         Text(
@@ -178,15 +192,5 @@ fun CourseScreen(
                 }
             )
         }
-    }
-}
-
-@Composable
-fun FullScreenLoading() {
-    Box(
-        modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)).zIndex(1f),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
     }
 }

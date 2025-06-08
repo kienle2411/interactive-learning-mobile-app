@@ -39,13 +39,15 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.se122.interactivelearning.R
 
 @Composable
 fun NavigationBar(
     navController: NavHostController
 ) {
-    val isSelected = remember { mutableStateOf("home") }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
     Row(
         modifier = Modifier
             .shadow(elevation = 10.dp)
@@ -57,20 +59,24 @@ fun NavigationBar(
     ) {
         NavBarList.forEach { item ->
             val iconSize by animateFloatAsState(
-                targetValue = if (isSelected.value == item.route) 28f else 22f,
-                animationSpec = if (isSelected.value == item.route) tween(durationMillis = 300) else tween(durationMillis = 0)
+                targetValue = if (currentRoute == item.route) 28f else 22f,
+                animationSpec = if (currentRoute == item.route) tween(durationMillis = 300) else tween(durationMillis = 0)
             )
             val fontSize by animateFloatAsState(
-                targetValue = if (isSelected.value == item.route) 12f else 10f,
-                animationSpec = if (isSelected.value == item.route) tween(durationMillis = 300) else tween(durationMillis = 0)
+                targetValue = if (currentRoute == item.route) 12f else 10f,
+                animationSpec = if (currentRoute == item.route) tween(durationMillis = 300) else tween(durationMillis = 0)
             )
             Box(
                 modifier = Modifier
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onPress = {
-                                isSelected.value = item.route
-                                navController.navigate(item.route)
+                                if (currentRoute != item.route) {
+                                    navController.navigate(item.route) {
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                }
                             }
                         )
                     }
@@ -80,7 +86,7 @@ fun NavigationBar(
                     verticalArrangement = Arrangement.spacedBy(3.dp)
                 ) {
                     Icon(
-                        painter = painterResource(id = if (isSelected.value == item.route) item.iconFilled else item.icon),
+                        painter = painterResource(id = if (currentRoute == item.route) item.iconFilled else item.icon),
                         contentDescription = item.title,
                         modifier = Modifier.size(iconSize.dp)
                     )
@@ -88,7 +94,7 @@ fun NavigationBar(
                         text = item.title,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = fontSize.sp,
-                        fontWeight =  if (isSelected.value == item.route) FontWeight.SemiBold else FontWeight.Normal
+                        fontWeight =  if (currentRoute == item.route) FontWeight.SemiBold else FontWeight.Normal
                     )
                 }
             }

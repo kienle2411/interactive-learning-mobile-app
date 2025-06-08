@@ -22,3 +22,5 @@ val GraySecondary = Color(0xFF7B8798)
 val GrayTertiary = Color(0xFFF7F7F8)
 
 val Background = Color(0xFFFFFFFF)
+
+val RedButton = Color(0xFFEA4335)

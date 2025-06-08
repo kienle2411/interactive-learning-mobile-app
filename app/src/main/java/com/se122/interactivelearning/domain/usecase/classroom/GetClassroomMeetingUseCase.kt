@@ -1,6 +1,5 @@
-package com.se122.interactivelearning.domain.usecase
+package com.se122.interactivelearning.domain.usecase.classroom
 
-import com.se122.interactivelearning.data.remote.api.ApiResponse
 import com.se122.interactivelearning.data.remote.api.ApiResult
 import com.se122.interactivelearning.data.remote.api.PaginationResponse
 import com.se122.interactivelearning.data.remote.dto.MeetingResponse

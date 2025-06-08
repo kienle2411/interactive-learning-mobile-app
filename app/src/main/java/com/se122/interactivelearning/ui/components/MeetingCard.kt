@@ -19,15 +19,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.se122.interactivelearning.data.remote.dto.MeetingResponse
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MeetingCard(
-    meeting: MeetingResponse
+    meeting: MeetingResponse,
+    onJoinClick: (String) -> Unit
 ) {
-    Card() {
+    val formatter = DateTimeFormatter.ISO_DATE_TIME
+    val now = ZonedDateTime.now()
+    val start = ZonedDateTime.parse(meeting.startTime, formatter).withZoneSameInstant(ZoneId.systemDefault())
+    val end = ZonedDateTime.parse(meeting.endTime, formatter).withZoneSameInstant(ZoneId.systemDefault())
+
+    Card {
         Text(
             text = meeting.title,
             style = MaterialTheme.typography.bodyMedium,
@@ -51,10 +58,10 @@ fun MeetingCard(
                 style = MaterialTheme.typography.bodySmall
             )
             Text(
-                text = when (ZonedDateTime.now()) {
-                    in ZonedDateTime.parse(meeting.startTime.toString(), DateTimeFormatter.ISO_DATE_TIME)..ZonedDateTime.parse(meeting.endTime.toString(), DateTimeFormatter.ISO_DATE_TIME) -> "Live"
+                text = when (now) {
+                    in start..end -> "Live"
                     else -> {
-                        if (ZonedDateTime.parse(meeting.endTime.toString(), DateTimeFormatter.ISO_DATE_TIME).isBefore(ZonedDateTime.now()))
+                        if (end.isBefore(now))
                             "Past"
                         else
                             "Upcoming"
@@ -62,15 +69,19 @@ fun MeetingCard(
                 },
                 modifier = Modifier
                     .background(
-                        color = if (ZonedDateTime.parse(meeting.startTime.toString(), DateTimeFormatter.ISO_DATE_TIME).isBefore(ZonedDateTime.now())
-                            && ZonedDateTime.parse(meeting.endTime.toString(), DateTimeFormatter.ISO_DATE_TIME).isAfter(ZonedDateTime.now()))
+                        color = if (start.isBefore(now)
+                            && end.isAfter(now))
                             Color.Green else Color.Red,
                         shape = RoundedCornerShape(12.dp))
                     .padding(horizontal = 12.dp, vertical = 8.dp),
                 color = Color.White
             )
         }
-        if (ZonedDateTime.parse(meeting.startTime.toString(), DateTimeFormatter.ISO_DATE_TIME).isBefore(ZonedDateTime.now()) && ZonedDateTime.parse(meeting.endTime.toString(), DateTimeFormatter.ISO_DATE_TIME).isAfter(ZonedDateTime.now())) {
+        Text(start.toString())
+        Text(end.toString())
+        Text(now.toString())
+        if (start.isBefore(now) && end.isAfter(now)) {
+            Text("Show")
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -79,7 +90,7 @@ fun MeetingCard(
             ) {
                 Button(
                     onClick = {
-
+                        onJoinClick(meeting.id)
                     },
                     modifier = Modifier.fillMaxWidth(1f / 3f)
                 ) {

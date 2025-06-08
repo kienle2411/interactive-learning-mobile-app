@@ -8,4 +8,5 @@ import javax.inject.Inject
 class MeetingJoinViewModel @Inject constructor(
 
 ): ViewModel() {
+
 }

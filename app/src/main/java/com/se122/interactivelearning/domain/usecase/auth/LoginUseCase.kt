@@ -1,11 +1,9 @@
-package com.se122.interactivelearning.domain.usecase
+package com.se122.interactivelearning.domain.usecase.auth
 
 import android.content.Context
-import android.util.Log
 import com.se122.interactivelearning.data.remote.api.ApiResult
 import com.se122.interactivelearning.data.remote.dto.LoginResponse
 import com.se122.interactivelearning.domain.repository.LoginRepository
-import com.se122.interactivelearning.domain.repository.LoginRepositoryImpl
 import com.se122.interactivelearning.utils.TokenManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

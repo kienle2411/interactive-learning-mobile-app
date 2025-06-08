@@ -2,7 +2,7 @@ package com.se122.interactivelearning
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.se122.interactivelearning.di.LogoutEventBus
+import com.se122.interactivelearning.common.events.LogoutEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

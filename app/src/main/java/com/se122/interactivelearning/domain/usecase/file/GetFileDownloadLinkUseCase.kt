@@ -1,4 +1,4 @@
-package com.se122.interactivelearning.domain.usecase
+package com.se122.interactivelearning.domain.usecase.file
 
 import com.se122.interactivelearning.data.remote.api.ApiResult
 import com.se122.interactivelearning.domain.repository.FileRepository

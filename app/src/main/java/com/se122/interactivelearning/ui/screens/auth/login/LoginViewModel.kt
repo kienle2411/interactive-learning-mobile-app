@@ -7,7 +7,7 @@ import com.se122.interactivelearning.common.ViewState
 import com.se122.interactivelearning.common.ViewState.*
 import com.se122.interactivelearning.data.remote.api.ApiResult
 import com.se122.interactivelearning.data.remote.dto.LoginResponse
-import com.se122.interactivelearning.domain.usecase.LoginUseCase
+import com.se122.interactivelearning.domain.usecase.auth.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

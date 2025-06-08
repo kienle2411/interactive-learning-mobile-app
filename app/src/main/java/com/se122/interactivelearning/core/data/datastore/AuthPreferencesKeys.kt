@@ -1,4 +1,4 @@
-package com.se122.interactivelearning.data
+package com.se122.interactivelearning.core.data.datastore
 
 import androidx.datastore.preferences.core.stringPreferencesKey
 

@@ -17,7 +17,6 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -28,7 +27,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "LIVEKIT_URL", "\"wss://first-pj-7dir78e1.livekit.cloud\"")
+        }
         release {
+            buildConfigField("String", "LIVEKIT_URL", "\"wss://first-pj-7dir78e1.livekit.cloud\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -45,6 +48,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -107,6 +111,11 @@ dependencies {
     implementation("io.socket:socket.io-client:2.1.1")
 
     implementation("io.livekit:livekit-android-compose-components:1.3.1")
+    implementation("io.livekit:livekit-android:1.3.1")
+
+    implementation("androidx.compose.foundation:foundation:1.8.2")
+
+    implementation("com.eygraber:compose-placeholder-material3:1.0.11")
 
 }
 

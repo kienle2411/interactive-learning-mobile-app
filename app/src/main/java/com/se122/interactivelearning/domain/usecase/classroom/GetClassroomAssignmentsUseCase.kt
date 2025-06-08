@@ -1,4 +1,4 @@
-package com.se122.interactivelearning.domain.usecase
+package com.se122.interactivelearning.domain.usecase.classroom
 
 import com.se122.interactivelearning.data.remote.api.ApiResult
 import com.se122.interactivelearning.data.remote.api.PaginationResponse

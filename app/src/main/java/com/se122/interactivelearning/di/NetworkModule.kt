@@ -1,31 +1,29 @@
 package com.se122.interactivelearning.di
 
-import android.util.Log
-import com.se122.interactivelearning.data.TokenAuthenticator
+import com.se122.interactivelearning.core.data.network.TokenAuthenticator
 import com.se122.interactivelearning.data.remote.api.AuthApi
 import com.se122.interactivelearning.data.remote.api.ClassroomApi
 import com.se122.interactivelearning.data.remote.api.FileApi
 import com.se122.interactivelearning.data.remote.api.MeetingApi
+import com.se122.interactivelearning.data.remote.api.UserApi
 import com.se122.interactivelearning.utils.TokenManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     @Provides
-    fun provideBaseUrl() = "http://192.168.1.8:3001/api/"
+    fun provideBaseUrl() = ""
 
     @Provides
     @Singleton
@@ -36,7 +34,6 @@ object NetworkModule {
 
         val tokenInterceptor = Interceptor { chain ->
             val token = runBlocking { tokenManager.getAccessToken() }
-            Log.d("Interceptor", "Access Token: $token")
             val originalRequest = chain.request()
             val requestUrl = originalRequest.url.toString()
             if (requestUrl.contains("/auth/refresh")) {
@@ -80,5 +77,11 @@ object NetworkModule {
     @Singleton
     fun provideMeetingApi(retrofit: Retrofit): MeetingApi {
         return retrofit.create(MeetingApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserApi(retrofit: Retrofit): UserApi {
+        return retrofit.create(UserApi::class.java)
     }
 }

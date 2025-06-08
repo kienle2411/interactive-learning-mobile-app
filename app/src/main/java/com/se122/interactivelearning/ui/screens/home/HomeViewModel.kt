@@ -8,8 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.se122.interactivelearning.data.remote.api.ApiResponse
 import com.se122.interactivelearning.data.remote.api.ApiResult
 import com.se122.interactivelearning.data.remote.dto.ProfileResponse
-import com.se122.interactivelearning.domain.usecase.GetProfileUseCase
-import com.se122.interactivelearning.domain.usecase.LoginUseCase
+import com.se122.interactivelearning.domain.usecase.profile.GetProfileUseCase
+import com.se122.interactivelearning.domain.usecase.auth.LoginUseCase
 import com.se122.interactivelearning.utils.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

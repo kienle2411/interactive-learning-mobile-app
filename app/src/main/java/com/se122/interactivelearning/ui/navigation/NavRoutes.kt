@@ -9,4 +9,10 @@ object NavRoutes {
     const val LOGIN = "login"
     const val REGISTER = "register"
     const val COURSE_DETAIL = "course_detail/{id}"
+
+    const val IN_MEETING = "in_meeting/{id}"
+    const val MEETING_JOIN = "meeting_join/{id}"
+
+    const val EDIT_PROFILE = "edit_profile"
+    const val SETTINGS = "settings"
 }

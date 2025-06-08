@@ -22,16 +22,6 @@ data class ClassroomStudentResponse(
     val classroom: ClassroomResponse
 )
 
-data class UserResponse(
-    val id: String,
-    val username: String,
-    val email: String,
-    val firstName: String,
-    val lastName: String,
-    val dateOfBirth: String,
-    val avatarUrl: String?
-)
-
 data class StudentGroupResponse(
     val id: String,
     val studentId: String,
