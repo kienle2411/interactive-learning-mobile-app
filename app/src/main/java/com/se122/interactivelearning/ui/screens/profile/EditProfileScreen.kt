@@ -85,7 +85,7 @@ fun EditProfileScreen(
 
     var selectedUri = remember { mutableStateOf<Uri?>(null) }
 
-    var avatarImage = remember { mutableStateOf("") }
+    var avatarImage = remember { mutableStateOf<String?>(null) }
 
     val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
         if (uri != null) {
@@ -104,9 +104,7 @@ fun EditProfileScreen(
             firstName.value = data.firstName
             lastName.value = data.lastName
             selectedDate = convertISODateToMillis(data.dateOfBirth)
-            if (data.avatarUrl.isNotEmpty()) {
-                avatarImage.value = data.avatarUrl
-            }
+            avatarImage.value = data.avatarUrl
         }
     }
 
@@ -139,7 +137,7 @@ fun EditProfileScreen(
            contentAlignment = Alignment.Center
        ) {
            AsyncImage(
-               model = if (avatarImage.value.isNotEmpty()) avatarImage.value else R.drawable.img_avatar,
+               model = avatarImage.value ?: R.drawable.img_avatar,
                contentDescription = "avatar_image",
                modifier = Modifier.size(120.dp).clip(RoundedCornerShape(10.dp)).border(1.dp, Color.Gray, RoundedCornerShape(10.dp)).placeholder(
                    visible = avatar is ViewState.Loading || profile is ViewState.Loading || profile is ViewState.Idle,

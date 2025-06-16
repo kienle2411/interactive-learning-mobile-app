@@ -31,13 +31,11 @@ fun ClassCard(
     Column(
         modifier = Modifier
             .padding(5.dp)
-            .border(color = GraySecondary, shape = RoundedCornerShape(8.dp), width = 1.dp)
-            .clickable(
-                indication = LocalIndication.current,
-                interactionSource = remember { MutableInteractionSource() }
-            ) {
+            .clip(RoundedCornerShape(8.dp))
+            .clickable {
                 onClick()
             }
+            .border(color = GraySecondary, shape = RoundedCornerShape(8.dp), width = 1.dp)
     ) {
         Image(
             painter = painterResource(id = R.drawable.classroom_card),

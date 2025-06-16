@@ -60,7 +60,7 @@ fun ProfileScreen(
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(20.dp),
-            modifier = Modifier.padding(vertical = 20.dp)
+            modifier = Modifier.padding(bottom = 20.dp)
         ) {
             Text(
                 text = "Profile Screen",

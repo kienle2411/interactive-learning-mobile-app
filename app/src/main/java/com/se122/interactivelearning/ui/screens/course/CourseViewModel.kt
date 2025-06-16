@@ -42,9 +42,9 @@ class CourseViewModel @Inject constructor(
                     _classroomList.value = Success(result.data.data)
                 }
                 is ApiResult.Error -> {
-                    Log.i("LoginViewModel", "Error: $result")
-                    val msg = (result.message + "\n" + result.errors?.first())
-                    _classroomList.value = Error(msg)
+//                    Log.i("LoginViewModel", "Error: $result")
+//                    val msg = (result.message + "\n" + result.errors?.first())
+//                    _classroomList.value = Error(msg)
                 }
                 is ApiResult.Exception -> {
                     val msg = "Unknown error"

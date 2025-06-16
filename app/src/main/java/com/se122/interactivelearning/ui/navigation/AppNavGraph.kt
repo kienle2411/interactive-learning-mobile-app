@@ -27,7 +27,7 @@ import com.se122.interactivelearning.ui.screens.profile.ProfileScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AppNavGraph(navController: NavHostController, modifier: Modifier) {
+fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
     NavHost(
         navController = navController,
         startDestination = NavRoutes.HOME,
@@ -121,7 +121,9 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier) {
                 val meetingId = backStackEntry.arguments?.getString("id")
                 InMeetingScreen(
                     id = meetingId.toString(),
-                    onEnđCallClick = {},
+                    onEndCallClick = {
+                        navController.navigate("home")
+                    },
                     meetingSharedViewModel = sharedViewModel
                 )
             }
