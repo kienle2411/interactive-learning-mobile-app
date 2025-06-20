@@ -4,6 +4,6 @@ data class ProfileRequest(
     val firstName: String,
     val lastName: String,
     val dateOfBirth: String,
-    val email: String,
-    val phone: String,
+//    val email: String,
+//    val phone: String,
 )

@@ -4,10 +4,13 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.common.api.ApiException
 import com.se122.interactivelearning.common.ViewState
 import com.se122.interactivelearning.data.remote.api.ApiResult
+import com.se122.interactivelearning.data.remote.dto.ProfileRequest
 import com.se122.interactivelearning.data.remote.dto.ProfileResponse
 import com.se122.interactivelearning.data.remote.dto.UploadAvatarResponse
+import com.se122.interactivelearning.domain.usecase.profile.EditProfileUseCase
 import com.se122.interactivelearning.domain.usecase.profile.GetProfileUseCase
 import com.se122.interactivelearning.domain.usecase.profile.UploadAvatarUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +27,7 @@ import javax.inject.Inject
 class EditProfileViewModel @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val uploadAvatarUseCase: UploadAvatarUseCase,
+    private val editProfileUseCase: EditProfileUseCase,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
     private val _profile = MutableStateFlow<ViewState<ProfileResponse>>(ViewState.Idle)
@@ -31,6 +35,9 @@ class EditProfileViewModel @Inject constructor(
 
     private val _avatar = MutableStateFlow<ViewState<UploadAvatarResponse>>(ViewState.Idle)
     val avatar = _avatar.asStateFlow()
+
+    private val _editProfile = MutableStateFlow<ViewState<ProfileResponse>>(ViewState.Idle)
+    val editProfile = _editProfile.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -76,4 +83,33 @@ class EditProfileViewModel @Inject constructor(
             }
         }
     }
+
+    fun editProfile(
+        firstName: String,
+        lastName: String,
+        dateOfBirth: String
+    ) {
+        viewModelScope.launch {
+            _editProfile.value = ViewState.Loading
+            val request = ProfileRequest(
+                firstName = firstName,
+                lastName = lastName,
+                dateOfBirth = dateOfBirth
+            )
+            when (val result = editProfileUseCase.invoke(request)) {
+                is ApiResult.Success -> {
+                    _editProfile.value = ViewState.Success(result.data)
+                    //reload profile???
+                    loadProfile()
+                }
+                is ApiResult.Error -> {
+                    _editProfile.value = ViewState.Error(result.message ?: "Unknown error")
+                }
+                is ApiResult.Exception -> {
+                    _editProfile.value = ViewState.Error("Unexpected error")
+                }
+            }
+        }
+    }
+
 }

@@ -76,6 +76,7 @@ fun EditProfileScreen(
 ) {
     val profile by editProfileViewModel.profile.collectAsState()
     val avatar by editProfileViewModel.avatar.collectAsState()
+    val editProfileState by editProfileViewModel.editProfile.collectAsState()
 
     val firstName = remember { mutableStateOf("") }
     val lastName = remember { mutableStateOf("") }
@@ -210,11 +211,31 @@ fun EditProfileScreen(
         }
         Button(
             onClick = {
-                editProfileViewModel.uploadAvatar(selectedUri.value!!)
-                selectedUri.value = null
+//                editProfileViewModel.uploadAvatar(selectedUri.value!!)
+//                selectedUri.value = null
+                if (selectedUri.value != null) {
+                    editProfileViewModel.uploadAvatar(selectedUri.value!!)
+                    selectedUri.value = null
+                }
+                if (selectedDate != null) {
+                    val dobString = convertMillisToDateISO(selectedDate!!)
+
+                    Log.d("EditProfile", "Sending data:")
+                    Log.d("EditProfile", "First name: ${firstName.value}")
+                    Log.d("EditProfile", "Last name: ${lastName.value}")
+                    Log.d("EditProfile", "Date of birth (ISO): $dobString")
+
+                    editProfileViewModel.editProfile(
+                        firstName = firstName.value,
+                        lastName = lastName.value,
+                        dateOfBirth = dobString
+                    )
+                }
             },
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            enabled = !(avatar is ViewState.Loading || profile is ViewState.Loading || profile is ViewState.Idle) && selectedUri.value != null
+//            enabled = !(avatar is ViewState.Loading || profile is ViewState.Loading || profile is ViewState.Idle) && selectedUri.value != null
+            enabled = (profile is ViewState.Success || profile is ViewState.Error)
+
         ) {
             Text("Save")
         }
@@ -231,6 +252,13 @@ fun convertISODateToMillis(date: String): Long {
     formatter.timeZone = TimeZone.getTimeZone("UTC")
     return formatter.parse(date)?.time ?: 0
 }
+
+fun convertMillisToDateISO(millis: Long): String {
+    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+    formatter.timeZone = TimeZone.getTimeZone("UTC")
+    return formatter.format(Date(millis))
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
