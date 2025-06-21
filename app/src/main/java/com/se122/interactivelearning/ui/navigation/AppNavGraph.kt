@@ -37,6 +37,7 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
             route = NavRoutes.HOME
         ) {
             HomeScreen(
+                navController = navController,
                 onButtonClick = {
                     navController.navigate("login")
                 }

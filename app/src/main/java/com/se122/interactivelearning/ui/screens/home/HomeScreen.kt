@@ -7,7 +7,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -21,16 +26,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.eygraber.compose.placeholder.PlaceholderHighlight
 import com.eygraber.compose.placeholder.material3.placeholder
 import com.eygraber.compose.placeholder.material3.shimmer
 import com.se122.interactivelearning.R
+import com.se122.interactivelearning.ui.components.HomeMeetingCard
 import com.se122.interactivelearning.ui.theme.GrayPrimary
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
+    navController: NavController,
     onButtonClick: () -> Unit
 ) {
     val user = viewModel.userState.value
@@ -79,6 +87,24 @@ fun HomeScreen(
             text = "Upcoming Meetings",
             style = MaterialTheme.typography.titleMedium
         )
+
+        val meetings = viewModel.meetingsState.value
+
+        LazyRow (
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            items(meetings) { meeting ->
+                HomeMeetingCard (
+                    meeting = meeting,
+                    onJoinClick = { meetingId ->
+                        navController.navigate("meeting_join/$meetingId")
+                    }
+                )
+            }
+        }
 
         Text(
             text = "Upcoming Assignments",
