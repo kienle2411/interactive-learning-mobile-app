@@ -25,7 +25,8 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SessionCard(
-    session: SessionResponse
+    session: SessionResponse,
+    onJoinClick: (String) -> Unit
 ) {
     Card {
         Text(
@@ -50,7 +51,9 @@ fun SessionCard(
                 horizontalArrangement = Arrangement.End
             ) {
                 Button(
-                    onClick = {}
+                    onClick = {
+                        onJoinClick(session.id)
+                    }
                 ) {
                     Text("Join")
                 }

@@ -8,3 +8,10 @@ data class ChatMessage(
     val senderName: String,
     val timestamp: Long,
 )
+
+data class ChatMessageSession(
+    val id: String,
+    val senderName: String,
+    val message: String,
+    val timestamp: Long
+)

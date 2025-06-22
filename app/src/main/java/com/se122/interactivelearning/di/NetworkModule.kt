@@ -5,6 +5,8 @@ import com.se122.interactivelearning.data.remote.api.AuthApi
 import com.se122.interactivelearning.data.remote.api.ClassroomApi
 import com.se122.interactivelearning.data.remote.api.FileApi
 import com.se122.interactivelearning.data.remote.api.MeetingApi
+import com.se122.interactivelearning.data.remote.api.QuizApi
+import com.se122.interactivelearning.data.remote.api.SessionApi
 import com.se122.interactivelearning.data.remote.api.UserApi
 import com.se122.interactivelearning.utils.TokenManager
 import dagger.Module
@@ -83,5 +85,17 @@ object NetworkModule {
     @Singleton
     fun provideUserApi(retrofit: Retrofit): UserApi {
         return retrofit.create(UserApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideQuizApi(retrofit: Retrofit): QuizApi {
+        return retrofit.create(QuizApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSessionApi(retrofit: Retrofit): SessionApi {
+        return retrofit.create(SessionApi::class.java)
     }
 }

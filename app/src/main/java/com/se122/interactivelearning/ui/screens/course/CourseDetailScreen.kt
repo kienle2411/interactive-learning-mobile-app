@@ -75,7 +75,8 @@ fun CourseDetailScreen(
     id: String,
     viewModel: CourseDetailViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
-    onJoinMeetingClick: (String) -> Unit
+    onJoinMeetingClick: (String) -> Unit,
+    onJoinSessionClick: (String) -> Unit
 ) {
     val classroomDetails by viewModel.classroomDetails.collectAsState()
     val classroomStudents by viewModel.classroomStudents.collectAsState()
@@ -293,7 +294,10 @@ fun CourseDetailScreen(
                                                 key = { it -> it.id }
                                             ) {
                                                 SessionCard(
-                                                    session = it
+                                                    session = it,
+                                                    onJoinClick = { id ->
+                                                        onJoinSessionClick(id)
+                                                    }
                                                 )
                                             }
                                         }

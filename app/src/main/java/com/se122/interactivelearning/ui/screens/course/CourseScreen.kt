@@ -42,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -183,6 +184,7 @@ fun CourseScreen(
                 },
                 modifier = Modifier
                     .zIndex(1f)
+                    .clip(RoundedCornerShape(5.dp))
                     .border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(5.dp))
                     .background(MaterialTheme.colorScheme.background),
                 content = {

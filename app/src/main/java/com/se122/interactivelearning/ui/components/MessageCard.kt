@@ -20,7 +20,7 @@ import org.json.JSONObject
 @Composable
 fun MessageCard(
     message: String,
-    senderName: String,
+    senderName: String = "",
     timestamp: Long,
     participant: Participant?
 ) {
@@ -37,7 +37,7 @@ fun MessageCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = participant?.name ?: "",
+                    text = participant?.name ?: senderName,
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
