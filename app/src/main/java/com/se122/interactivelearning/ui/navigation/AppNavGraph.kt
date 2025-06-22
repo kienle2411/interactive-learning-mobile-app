@@ -24,6 +24,7 @@ import com.se122.interactivelearning.ui.screens.meeting.MeetingSharedViewModel
 import com.se122.interactivelearning.ui.screens.notification.NotificationScreen
 import com.se122.interactivelearning.ui.screens.profile.EditProfileScreen
 import com.se122.interactivelearning.ui.screens.profile.ProfileScreen
+import com.se122.interactivelearning.ui.screens.session.InSessionScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -107,6 +108,9 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
                 },
                 onJoinMeetingClick = { meetingId ->
                     navController.navigate("meeting_join/${meetingId}")
+                },
+                onJoinSessionClick = { sessionId ->
+                    navController.navigate("in_session/${sessionId}")
                 }
             )
         }
@@ -146,6 +150,17 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
                     meetingSharedViewModel = sharedViewModel
                 )
             }
+        }
+        composable(
+            route = NavRoutes.IN_SESSION
+        ) { backStackEntry ->
+            val sessionId = backStackEntry.arguments?.getString("id")
+            InSessionScreen(
+                sessionId = sessionId.toString(),
+                onLeaveClick = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }

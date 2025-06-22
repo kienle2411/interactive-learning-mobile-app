@@ -15,4 +15,6 @@ object NavRoutes {
 
     const val EDIT_PROFILE = "edit_profile"
     const val SETTINGS = "settings"
+
+    const val IN_SESSION = "in_session/{id}"
 }
