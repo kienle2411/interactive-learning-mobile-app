@@ -160,8 +160,19 @@ fun InMeetingScreen(
                             ) {
                                 val metadata = it?.metadata
                                 if (metadata != null) {
-                                    val json = JSONObject(metadata)
-                                    val avatar = json.optString("avatar")
+//                                    val json = JSONObject(metadata)
+//                                    val avatar = json.optString("avatar")
+                                    val avatar = try {
+                                        if (!metadata.isNullOrBlank()) {
+                                            val json = JSONObject(metadata)
+                                            json.optString("avatar")
+                                        } else {
+                                            null
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                        null
+                                    }
                                     AsyncImage(
                                         model = avatar ?: R.drawable.img_avatar,
                                         contentDescription = "avatar",
@@ -350,8 +361,9 @@ fun InMeetingScreen(
                                             .fillMaxWidth()
                                             .horizontalScroll(rememberScrollState())
                                     ) {
+                                        val localIdentity = room?.localParticipant?.identity
                                         participants.forEach {
-                                            if (it != null && it.isCameraEnabled()) {
+                                            if (it != null && it.isCameraEnabled() && it.identity != localIdentity) {
                                                 VideoTrackView(
                                                     videoTrack = it.getTrackPublication(Track.Source.CAMERA)?.track as VideoTrack?,
                                                     modifier = Modifier
