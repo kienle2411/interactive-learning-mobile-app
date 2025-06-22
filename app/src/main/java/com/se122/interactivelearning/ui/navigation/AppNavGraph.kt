@@ -2,11 +2,22 @@ package com.se122.interactivelearning.ui.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -60,6 +71,8 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
         composable(
             route = NavRoutes.PROFILE
         ) {
+            var showAboutDialog by remember { mutableStateOf(false) }
+
             ProfileScreen(
                 onEditProfileClick = {
                     navController.navigate("edit_profile")
@@ -67,8 +80,46 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
                 onSettingsClick = {
                     navController.navigate("settings")
                 },
-                onAboutClick = {}
+                onAboutClick = {
+                    showAboutDialog = true
+                }
             )
+            if (showAboutDialog) {
+                AlertDialog(
+                    onDismissRequest = { showAboutDialog = false },
+                    confirmButton = {
+                        TextButton(onClick = { showAboutDialog = false }) {
+                            Text("OK".uppercase(), style = MaterialTheme.typography.labelLarge)
+                        }
+                    },
+                    title = {
+                        Text(
+                            text = "About this App",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                    },
+                    text = {
+                        Column {
+                            Text(
+                                text = "This application is the project for SE122.",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = "Developed by:",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "• 22520705 - Le Trung Kien\n• 22521148 - Nguyen Dang Kim Phung",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(16.dp),
+                    tonalElevation = 8.dp,
+                )
+            }
         }
         composable(
             route = NavRoutes.EDIT_PROFILE

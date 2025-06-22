@@ -32,7 +32,10 @@ import com.eygraber.compose.placeholder.PlaceholderHighlight
 import com.eygraber.compose.placeholder.material3.placeholder
 import com.eygraber.compose.placeholder.material3.shimmer
 import com.se122.interactivelearning.R
+import com.se122.interactivelearning.data.remote.dto.QuestionData
+import com.se122.interactivelearning.data.remote.dto.QuestionOption
 import com.se122.interactivelearning.ui.components.HomeMeetingCard
+import com.se122.interactivelearning.ui.components.MultipleChoiceQuestion
 import com.se122.interactivelearning.ui.theme.GrayPrimary
 
 @Composable
@@ -110,5 +113,6 @@ fun HomeScreen(
             text = "Upcoming Assignments",
             style = MaterialTheme.typography.titleMedium
         )
+
     }
 }

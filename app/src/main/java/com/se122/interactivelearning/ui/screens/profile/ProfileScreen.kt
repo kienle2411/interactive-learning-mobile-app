@@ -52,7 +52,7 @@ fun ProfileScreen(
     profileViewModel: ProfileViewModel = hiltViewModel(),
     onEditProfileClick: () -> Unit?,
     onSettingsClick: () -> Unit?,
-    onAboutClick: () -> Unit?
+    onAboutClick: () -> Unit
 ) {
     val profile by profileViewModel.profile.collectAsState()
     LaunchedEffect (Unit) {
@@ -122,7 +122,9 @@ fun ProfileScreen(
         RowButton(
             imageVector = Icons.Default.Info,
             text = "About This App",
-            onClick = {}
+            onClick = {
+                onAboutClick()
+            }
         )
         HorizontalDivider()
         Spacer(modifier = Modifier.height(10.dp))
