@@ -49,9 +49,8 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
             route = NavRoutes.HOME
         ) {
             HomeScreen(
-                navController = navController,
-                onButtonClick = {
-                    navController.navigate("login")
+                onJoinMeetingClick = {
+                    navController.navigate("meeting_join/${it}")
                 }
             )
         }
@@ -72,55 +71,14 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
         composable(
             route = NavRoutes.PROFILE
         ) {
-            var showAboutDialog by remember { mutableStateOf(false) }
-
             ProfileScreen(
                 onEditProfileClick = {
                     navController.navigate("edit_profile")
                 },
                 onSettingsClick = {
                     navController.navigate("settings")
-                },
-                onAboutClick = {
-                    showAboutDialog = true
                 }
             )
-            if (showAboutDialog) {
-                AlertDialog(
-                    onDismissRequest = { showAboutDialog = false },
-                    confirmButton = {
-                        TextButton(onClick = { showAboutDialog = false }) {
-                            Text("OK".uppercase(), style = MaterialTheme.typography.labelLarge)
-                        }
-                    },
-                    title = {
-                        Text(
-                            text = "About this App",
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                    },
-                    text = {
-                        Column {
-                            Text(
-                                text = "This application is the project for SE122.",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Text(
-                                text = "Developed by:",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = "• 22520705 - Le Trung Kien\n• 22521148 - Nguyen Dang Kim Phung",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    },
-                    shape = RoundedCornerShape(16.dp),
-                    tonalElevation = 8.dp,
-                )
-            }
         }
         composable(
             route = NavRoutes.EDIT_PROFILE

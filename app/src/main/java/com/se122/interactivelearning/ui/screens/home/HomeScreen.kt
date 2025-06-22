@@ -1,7 +1,10 @@
 package com.se122.interactivelearning.ui.screens.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,9 +15,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -32,19 +44,21 @@ import com.eygraber.compose.placeholder.PlaceholderHighlight
 import com.eygraber.compose.placeholder.material3.placeholder
 import com.eygraber.compose.placeholder.material3.shimmer
 import com.se122.interactivelearning.R
-import com.se122.interactivelearning.data.remote.dto.QuestionData
-import com.se122.interactivelearning.data.remote.dto.QuestionOption
+import com.se122.interactivelearning.ui.components.HexagonIconButton
 import com.se122.interactivelearning.ui.components.HomeMeetingCard
 import com.se122.interactivelearning.ui.components.MultipleChoiceQuestion
 import com.se122.interactivelearning.ui.theme.GrayPrimary
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    navController: NavController,
-    onButtonClick: () -> Unit
+    onJoinMeetingClick: (String) -> Unit
 ) {
     val user = viewModel.userState.value
+    val meetings = viewModel.meetingsState.value
+    val exploreList = listOf("My Classrooms", "Quizzes")
+
     LaunchedEffect(Unit) {
         viewModel.loadUserProfile()
     }
@@ -86,33 +100,136 @@ fun HomeScreen(
                 )
             }
         }
-        Text(
-            text = "Upcoming Meetings",
-            style = MaterialTheme.typography.titleMedium
-        )
 
-        val meetings = viewModel.meetingsState.value
-
-        LazyRow (
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
         ) {
-            items(meetings) { meeting ->
-                HomeMeetingCard (
-                    meeting = meeting,
-                    onJoinClick = { meetingId ->
-                        navController.navigate("meeting_join/$meetingId")
-                    }
-                )
+            Text(
+                text = "Explore",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Column {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    HexagonIconButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = {},
+                        text = "My Classrooms",
+                        icon = {
+                            Icon(
+                                tint = Color.White,
+                                painter = painterResource(R.drawable.ic_course),
+                                contentDescription = "icon"
+                            )
+                        }
+                    )
+                    HexagonIconButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = {},
+                        text = "Quizzes",
+                        icon = {
+                            Icon(
+                                tint = Color.White,
+                                painter = painterResource(R.drawable.ic_user),
+                                contentDescription = "icon"
+                            )
+                        }
+                    )
+                }
             }
+            Column {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    HexagonIconButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = {},
+                        text = "My Classrooms",
+                        icon = {
+                            Icon(
+                                tint = Color.White,
+                                painter = painterResource(R.drawable.ic_course),
+                                contentDescription = "icon"
+                            )
+                        }
+                    )
+                    HexagonIconButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = {},
+                        text = "Quizzes",
+                        icon = {
+                            Icon(
+                                tint = Color.White,
+                                painter = painterResource(R.drawable.ic_user),
+                                contentDescription = "icon"
+                            )
+                        }
+                    )
+                }
+            }
+            Column {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    HexagonIconButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = {},
+                        text = "My Classrooms",
+                        icon = {
+                            Icon(
+                                tint = Color.White,
+                                painter = painterResource(R.drawable.ic_course),
+                                contentDescription = "icon"
+                            )
+                        }
+                    )
+                    HexagonIconButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = {},
+                        text = "Quizzes",
+                        icon = {
+                            Icon(
+                                tint = Color.White,
+                                painter = painterResource(R.drawable.ic_user),
+                                contentDescription = "icon"
+                            )
+                        }
+                    )
+                }
+            }
+
+
+            Text(
+                text = "Upcoming Meetings",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            LazyRow (
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                items(
+                    items = meetings,
+                    key = { it.id }
+                ) {
+                    HomeMeetingCard(
+                        meeting = it,
+                        onJoinClick = {
+                            onJoinMeetingClick(it)
+                        }
+                    )
+                }
+            }
+
+            Text(
+                text = "Upcoming Assignments",
+                style = MaterialTheme.typography.titleMedium
+            )
         }
-
-        Text(
-            text = "Upcoming Assignments",
-            style = MaterialTheme.typography.titleMedium
-        )
-
     }
 }

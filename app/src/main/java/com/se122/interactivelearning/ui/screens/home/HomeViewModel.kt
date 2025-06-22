@@ -48,6 +48,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
     fun clearToken() {
         viewModelScope.launch {
             tokenManager.clearToken()
