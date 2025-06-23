@@ -57,7 +57,11 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
                 },
                 onJoinMeetingClick = {
                     navController.navigate("meeting_join/${it}")
+                },
+                onJoinSessionClick = { sessionId ->
+                    navController.navigate("in_session/${sessionId}")
                 }
+
             )
         }
         composable(
