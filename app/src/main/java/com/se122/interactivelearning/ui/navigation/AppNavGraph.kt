@@ -35,6 +35,9 @@ import com.se122.interactivelearning.ui.screens.meeting.MeetingSharedViewModel
 import com.se122.interactivelearning.ui.screens.notification.NotificationScreen
 import com.se122.interactivelearning.ui.screens.profile.EditProfileScreen
 import com.se122.interactivelearning.ui.screens.profile.ProfileScreen
+import com.se122.interactivelearning.ui.screens.quiz.InQuizScreen
+import com.se122.interactivelearning.ui.screens.quiz.QuizJoinScreen
+import com.se122.interactivelearning.ui.screens.quiz.QuizListScreen
 import com.se122.interactivelearning.ui.screens.session.InSessionScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -49,6 +52,9 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
             route = NavRoutes.HOME
         ) {
             HomeScreen(
+                onQuizzesClick = {
+                    navController.navigate("quizzes")
+                },
                 onJoinMeetingClick = {
                     navController.navigate("meeting_join/${it}")
                 }
@@ -169,6 +175,37 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
                 sessionId = sessionId.toString(),
                 onLeaveClick = {
                     navController.popBackStack()
+                }
+            )
+        }
+        composable(
+            route = NavRoutes.QUIZ_JOIN
+        ) { backStackEntry ->
+            val quizId = backStackEntry.arguments?.getString("id")
+            QuizJoinScreen(
+                quizId = quizId.toString(),
+                onJoinClick = {},
+                onBackClick = {},
+                onStart = {
+                    navController.navigate("in_quiz/${quizId}")
+                }
+            )
+        }
+        composable(
+            route = NavRoutes.IN_QUIZ
+        ) { backStackEntry ->
+            val quizId = backStackEntry.arguments?.getString("id")
+            InQuizScreen(
+                quizId = quizId.toString(),
+                onBackClick = {}
+            )
+        }
+        composable(
+            route = NavRoutes.QUIZZES
+        ) {
+            QuizListScreen(
+                onJoin = {
+                    navController.navigate("quiz_join/${it}")
                 }
             )
         }

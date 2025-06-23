@@ -53,11 +53,11 @@ import com.se122.interactivelearning.ui.theme.GrayPrimary
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    onJoinMeetingClick: (String) -> Unit
+    onJoinMeetingClick: (String) -> Unit,
+    onQuizzesClick: () -> Unit
 ) {
     val user = viewModel.userState.value
     val meetings = viewModel.meetingsState.value
-    val exploreList = listOf("My Classrooms", "Quizzes")
 
     LaunchedEffect(Unit) {
         viewModel.loadUserProfile()
@@ -128,7 +128,9 @@ fun HomeScreen(
                     )
                     HexagonIconButton(
                         modifier = Modifier.weight(1f),
-                        onClick = {},
+                        onClick = {
+                            onQuizzesClick()
+                        },
                         text = "Quizzes",
                         icon = {
                             Icon(
@@ -200,7 +202,6 @@ fun HomeScreen(
                     )
                 }
             }
-
 
             Text(
                 text = "Upcoming Meetings",

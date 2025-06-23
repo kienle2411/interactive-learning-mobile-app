@@ -8,12 +8,14 @@ import com.se122.interactivelearning.domain.repository.LoginRepository
 import com.se122.interactivelearning.data.repository.LoginRepositoryImpl
 import com.se122.interactivelearning.domain.repository.MeetingRepository
 import com.se122.interactivelearning.data.repository.MeetingRepositoryImpl
+import com.se122.interactivelearning.data.repository.QuestionRepositoryImpl
 import com.se122.interactivelearning.data.repository.QuizRepositoryImpl
 import com.se122.interactivelearning.data.repository.QuizSocketRepositoryImpl
 import com.se122.interactivelearning.data.repository.SessionRepositoryImpl
 import com.se122.interactivelearning.data.repository.SessionSocketRepositoryImpl
 import com.se122.interactivelearning.domain.repository.UserRepository
 import com.se122.interactivelearning.data.repository.UserRepositoryImpl
+import com.se122.interactivelearning.domain.repository.QuestionRepository
 import com.se122.interactivelearning.domain.repository.QuizRepository
 import com.se122.interactivelearning.domain.repository.QuizSocketRepository
 import com.se122.interactivelearning.domain.repository.SessionRepository
@@ -80,4 +82,10 @@ abstract class RepositoryModule {
     abstract fun bindQuizRepository(
         quizRepositoryImpl: QuizRepositoryImpl
     ): QuizRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindQuestionRepository(
+        questionRepositoryImpl: QuestionRepositoryImpl
+    ): QuestionRepository
 }

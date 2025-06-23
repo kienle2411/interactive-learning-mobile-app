@@ -23,10 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.se122.interactivelearning.data.remote.dto.QuestionData
+import com.se122.interactivelearning.data.remote.dto.QuestionResponse
 
 @Composable
-fun MultipleChoiceQuestion(questionData: QuestionData) {
+fun MultipleChoiceQuestion(questionData: QuestionResponse) {
     var selectedOptionId by remember { mutableStateOf<String?>(null) }
     var submitted by remember { mutableStateOf(false) }
 

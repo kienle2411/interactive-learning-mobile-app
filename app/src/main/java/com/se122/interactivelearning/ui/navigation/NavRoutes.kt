@@ -17,4 +17,8 @@ object NavRoutes {
     const val SETTINGS = "settings"
 
     const val IN_SESSION = "in_session/{id}"
+
+    const val QUIZ_JOIN = "quiz_join/{id}"
+    const val IN_QUIZ = "in_quiz/{id}"
+    const val QUIZZES = "quizzes"
 }

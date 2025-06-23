@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.se122.interactivelearning.common.ViewState
 import com.se122.interactivelearning.data.remote.api.ApiResult
 import com.se122.interactivelearning.data.remote.dto.QuizResponse
+import com.se122.interactivelearning.domain.repository.QuizSocketRepository
 import com.se122.interactivelearning.domain.usecase.quiz.GetQuizInformationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,10 +15,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class QuizJoinViewModel @Inject constructor(
-    private val getQuizInformationUseCase: GetQuizInformationUseCase
+    private val getQuizInformationUseCase: GetQuizInformationUseCase,
+    private val quizSocketRepository: QuizSocketRepository
 ): ViewModel() {
     private val _quiz = MutableStateFlow<ViewState<QuizResponse>>(ViewState.Idle)
     val quiz = _quiz.asStateFlow()
+
+    val startEvent = quizSocketRepository.startEvent
 
     fun getQuiz(id: String) {
         viewModelScope.launch {
@@ -26,7 +30,9 @@ class QuizJoinViewModel @Inject constructor(
                 is ApiResult.Success -> {
                     _quiz.value = ViewState.Success(result.data)
                 }
-                else -> {}
+                else -> {
+                    _quiz.value = ViewState.Error("Error")
+                }
             }
         }
     }

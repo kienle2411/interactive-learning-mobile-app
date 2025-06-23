@@ -20,6 +20,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.se122.interactivelearning.common.ViewState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,13 +31,24 @@ fun QuizJoinScreen(
     quizId: String,
     quizJoinViewModel: QuizJoinViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
-    onJoinClick: () -> Unit
+    onJoinClick: () -> Unit,
+    onStart: () -> Unit
 ) {
     val quiz by quizJoinViewModel.quiz.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(quizId) {
         quizJoinViewModel.getQuiz(quizId)
     }
+
+    LaunchedEffect(Unit) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            quizJoinViewModel.startEvent.collect {
+                onStart.invoke()
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(

@@ -1,6 +1,6 @@
 package com.se122.interactivelearning.data.remote.dto
 
-data class QuestionData(
+data class QuestionResponse(
     val id: String,
     val content: String,
     val timeLimit: Int,
@@ -13,5 +13,5 @@ data class QuestionOption(
     val id: String,
     val option: String,
     val isCorrect: Boolean,
-    val deletedAt: String? // null if not deleted
+    val deletedAt: String?
 )
