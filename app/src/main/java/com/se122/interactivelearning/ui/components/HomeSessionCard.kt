@@ -5,7 +5,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,21 +24,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.se122.interactivelearning.R
-import com.se122.interactivelearning.data.remote.dto.MeetingResponse
+import com.se122.interactivelearning.data.remote.dto.SessionResponse
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeMeetingCard(
-    meeting: MeetingResponse,
+fun HomeSessionCard(
+    session: SessionResponse,
     onJoinClick: (String) -> Unit
 ) {
     val formatter = DateTimeFormatter.ISO_DATE_TIME
     val now = ZonedDateTime.now()
-    val start = ZonedDateTime.parse(meeting.startTime, formatter).withZoneSameInstant(ZoneId.systemDefault())
-    val end = ZonedDateTime.parse(meeting.endTime, formatter).withZoneSameInstant(ZoneId.systemDefault())
+    val start = ZonedDateTime.parse(session.startTime, formatter).withZoneSameInstant(ZoneId.systemDefault())
+    val end = ZonedDateTime.parse(session.endTime, formatter).withZoneSameInstant(ZoneId.systemDefault())
 
     val status = when (now) {
         in start..end -> "Live"
@@ -59,16 +58,14 @@ fun HomeMeetingCard(
         shape = RoundedCornerShape(16.dp)
     ) {
         Column {
-
             Image(
-                painter = painterResource(id = R.drawable.meeting_pic),
-                contentDescription = "Meeting Image",
+                painter = painterResource(id = R.drawable.session_pic),
+                contentDescription = "Session Image",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp)
             )
 
-            // DETAILS (1/3 bottom)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -76,12 +73,12 @@ fun HomeMeetingCard(
                     .padding(16.dp)
             ) {
                 Text(
-                    text = meeting.title,
+                    text = session.title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 
-                meeting.description?.let {
+                session.description?.let {
                     Text(
                         text = it,
                         style = MaterialTheme.typography.bodySmall,
@@ -95,7 +92,7 @@ fun HomeMeetingCard(
                     modifier = Modifier.padding(top = 6.dp)
                 )
 
-                Row(
+                Row (
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 10.dp),
@@ -112,7 +109,7 @@ fun HomeMeetingCard(
 
                     if (status == "Live") {
                         Button (
-                            onClick = { onJoinClick(meeting.id) }
+                            onClick = { onJoinClick(session.id) }
                         ) {
                             Text("Join")
                         }

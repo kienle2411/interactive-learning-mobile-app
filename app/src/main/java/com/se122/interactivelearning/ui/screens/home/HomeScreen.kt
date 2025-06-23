@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -44,8 +46,10 @@ import com.eygraber.compose.placeholder.PlaceholderHighlight
 import com.eygraber.compose.placeholder.material3.placeholder
 import com.eygraber.compose.placeholder.material3.shimmer
 import com.se122.interactivelearning.R
+import com.se122.interactivelearning.data.remote.dto.MeetingResponse
 import com.se122.interactivelearning.ui.components.HexagonIconButton
 import com.se122.interactivelearning.ui.components.HomeMeetingCard
+import com.se122.interactivelearning.ui.components.HomeSessionCard
 import com.se122.interactivelearning.ui.components.MultipleChoiceQuestion
 import com.se122.interactivelearning.ui.theme.GrayPrimary
 
@@ -53,10 +57,12 @@ import com.se122.interactivelearning.ui.theme.GrayPrimary
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    onJoinMeetingClick: (String) -> Unit
+    onJoinMeetingClick: (String) -> Unit,
+    onJoinSessionClick: (String) -> Unit
 ) {
     val user = viewModel.userState.value
     val meetings = viewModel.meetingsState.value
+    val sessions = viewModel.sessionsState.value
     val exploreList = listOf("My Classrooms", "Quizzes")
 
     LaunchedEffect(Unit) {
@@ -74,10 +80,12 @@ fun HomeScreen(
             AsyncImage(
                 model = user?.avatarUrl ?: R.drawable.img_avatar,
                 contentDescription = "avatar_image",
-                modifier = Modifier.size(40.dp).clip(RoundedCornerShape(40.dp)).border(width = 1.dp, color = GrayPrimary, shape = RoundedCornerShape(40.dp)).placeholder(
-                    visible = user == null,
-                    highlight = PlaceholderHighlight.shimmer()
-                )
+                modifier = Modifier.size(40.dp).clip(RoundedCornerShape(40.dp))
+                    .border(width = 1.dp, color = GrayPrimary, shape = RoundedCornerShape(40.dp))
+                    .placeholder(
+                        visible = user == null,
+                        highlight = PlaceholderHighlight.shimmer()
+                    )
             )
             Column {
                 Row {
@@ -109,37 +117,36 @@ fun HomeScreen(
                 text = "Explore",
                 style = MaterialTheme.typography.titleMedium
             )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                HexagonIconButton(
+                    modifier = Modifier.weight(1f),
+                    onClick = {},
+                    text = "My Classrooms",
+                    icon = {
+                        Icon(
+                            tint = Color.White,
+                            painter = painterResource(R.drawable.ic_course),
+                            contentDescription = "icon"
+                        )
+                    }
+                )
+                HexagonIconButton(
+                    modifier = Modifier.weight(1f),
+                    onClick = {},
+                    text = "Quizzes",
+                    icon = {
+                        Icon(
+                            tint = Color.White,
+                            painter = painterResource(R.drawable.ic_user),
+                            contentDescription = "icon"
+                        )
+                    }
+                )
 
-            Column {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    HexagonIconButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = {},
-                        text = "My Classrooms",
-                        icon = {
-                            Icon(
-                                tint = Color.White,
-                                painter = painterResource(R.drawable.ic_course),
-                                contentDescription = "icon"
-                            )
-                        }
-                    )
-                    HexagonIconButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = {},
-                        text = "Quizzes",
-                        icon = {
-                            Icon(
-                                tint = Color.White,
-                                painter = painterResource(R.drawable.ic_user),
-                                contentDescription = "icon"
-                            )
-                        }
-                    )
-                }
             }
+
             Column {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -207,7 +214,7 @@ fun HomeScreen(
                 style = MaterialTheme.typography.titleMedium
             )
 
-            LazyRow (
+            LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -227,9 +234,29 @@ fun HomeScreen(
             }
 
             Text(
-                text = "Upcoming Assignments",
+                text = "Upcoming Sessions",
                 style = MaterialTheme.typography.titleMedium
             )
+
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                items(
+                    items = sessions,
+                    key = { it.id }
+                ) {
+                    HomeSessionCard (
+                        session = it,
+                        onJoinClick = {
+                            onJoinSessionClick(it)
+                        }
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(48.dp))
         }
     }
 }
