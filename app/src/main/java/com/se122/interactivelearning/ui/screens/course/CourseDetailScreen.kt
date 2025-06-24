@@ -63,6 +63,7 @@ import com.se122.interactivelearning.ui.components.MaterialCard
 import com.se122.interactivelearning.ui.components.StudentCard
 import androidx.core.net.toUri
 import com.se122.interactivelearning.ui.components.AssignmentCard
+import com.se122.interactivelearning.ui.components.GroupCard
 import com.se122.interactivelearning.ui.components.MeetingCard
 import com.se122.interactivelearning.ui.components.SessionCard
 import kotlinx.coroutines.coroutineScope
@@ -85,12 +86,14 @@ fun CourseDetailScreen(
     val classroomMeetings by viewModel.classroomMeetings.collectAsState()
     val classroomAssignments by viewModel.classroomAssignments.collectAsState()
     val fileDownloadLink by viewModel.fileDownloadLink.collectAsState()
+    val groupsState by viewModel.groupsState.collectAsState()
+
 
     val context = LocalContext.current
 
     val coroutineScope = rememberCoroutineScope()
 
-    val tabs = listOf("Session", "Meeting", "Assignment", "Material", "Information")
+    val tabs = listOf("Session", "Meeting", "Groups", "Material", "Information")
     val pagerState = rememberPagerState(
         initialPage = 0,
         pageCount = { tabs.size }
@@ -109,6 +112,7 @@ fun CourseDetailScreen(
         viewModel.loadMaterials(id)
         viewModel.loadSessions(id)
         viewModel.loadMeetings(id)
+        viewModel.loadGroups(id)
         //viewModel.loadAssignments(id)
     }
 
@@ -137,9 +141,18 @@ fun CourseDetailScreen(
         }
     }
 
-    LaunchedEffect(classroomAssignments) {
+//    LaunchedEffect(classroomAssignments) {
+//        if (pagerState.currentPage == 2) {
+//            when (classroomAssignments) {
+//                is ViewState.Success, is ViewState.Error -> refreshingStates[2].value = false
+//                else -> {}
+//            }
+//        }
+//    }
+
+    LaunchedEffect(groupsState) {
         if (pagerState.currentPage == 2) {
-            when (classroomAssignments) {
+            when (groupsState) {
                 is ViewState.Success, is ViewState.Error -> refreshingStates[2].value = false
                 else -> {}
             }
@@ -263,7 +276,7 @@ fun CourseDetailScreen(
                                 when (it) {
                                     0 -> viewModel.loadSessions(id)
                                     1 -> viewModel.loadMeetings(id)
-                                    2 -> viewModel.loadAssignments(id)
+                                    2 -> viewModel.loadGroups(id)
                                     3 -> viewModel.loadMaterials(id)
                                     4 -> viewModel.loadStudentList(id)
                                 }
@@ -346,9 +359,9 @@ fun CourseDetailScreen(
                                 }
                             }
                             2 -> {
-                                when (classroomAssignments) {
+                                when (groupsState) {
                                     is ViewState.Success -> {
-                                        val classroomAssignments = (classroomAssignments as ViewState.Success).data
+                                        val classroomAssignments = (groupsState as ViewState.Success).data
                                         LazyColumn(
                                             modifier = Modifier.fillMaxSize(),
                                             verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -357,8 +370,8 @@ fun CourseDetailScreen(
                                                 items = classroomAssignments,
                                                 key = { it -> it.id }
                                             ) {
-                                                AssignmentCard(
-                                                    assignment = it
+                                                GroupCard(
+                                                    group = it
                                                 )
                                             }
                                         }

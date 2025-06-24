@@ -8,6 +8,7 @@ import com.se122.interactivelearning.data.remote.dto.AssignmentResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomDetailsResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomStudentResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomWrapperResponse
+import com.se122.interactivelearning.data.remote.dto.Group
 import com.se122.interactivelearning.data.remote.dto.MaterialResponse
 import com.se122.interactivelearning.data.remote.dto.MeetingResponse
 import com.se122.interactivelearning.data.remote.dto.SessionResponse
@@ -55,6 +56,12 @@ class ClassroomRepositoryImpl @Inject constructor(
     override suspend fun joinClassroom(code: String): ApiResult<ClassroomStudentResponse> {
         return safeApiCall {
             classroomApi.joinClassroom(code)
+        }
+    }
+
+    override suspend fun getClassroomGroups(id: String): ApiResult<PaginationResponse<Group>> {
+        return safeApiCall {
+            classroomApi.getClassroomGroups(id)
         }
     }
 }

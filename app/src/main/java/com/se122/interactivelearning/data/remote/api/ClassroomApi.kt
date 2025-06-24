@@ -4,6 +4,7 @@ import com.se122.interactivelearning.data.remote.dto.AssignmentResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomDetailsResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomStudentResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomWrapperResponse
+import com.se122.interactivelearning.data.remote.dto.Group
 import com.se122.interactivelearning.data.remote.dto.MaterialResponse
 import com.se122.interactivelearning.data.remote.dto.MeetingResponse
 import com.se122.interactivelearning.data.remote.dto.SessionResponse
@@ -31,6 +32,9 @@ interface ClassroomApi {
 
     @GET("classrooms/{id}/meetings")
     suspend fun getClassroomMeetings(@Path("id") id: String): Response<ApiResponse<PaginationResponse<MeetingResponse>>>
+
+    @GET("classrooms/{id}/groups")
+    suspend fun getClassroomGroups(@Path("id") classroomId: String): Response<ApiResponse<PaginationResponse<Group>>>
 
     @GET("classrooms/{id}/assignments")
     suspend fun getClassroomAssignments(@Path("id") id: String): Response<ApiResponse<PaginationResponse<AssignmentResponse>>>
