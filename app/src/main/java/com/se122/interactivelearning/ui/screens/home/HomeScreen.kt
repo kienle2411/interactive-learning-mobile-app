@@ -135,7 +135,7 @@ fun HomeScreen(
                 )
                 HexagonIconButton(
                     modifier = Modifier.weight(1f),
-                    onClick = {},
+                    onClick = { onQuizzesClick() },
                     text = "Quizzes",
                     icon = {
                         Icon(
