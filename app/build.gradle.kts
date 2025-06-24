@@ -116,6 +116,7 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.8.2")
 
     implementation("com.eygraber:compose-placeholder-material3:1.0.11")
+    implementation("androidx.compose.material:material-icons-extended:1.6.0")
 
 }
 

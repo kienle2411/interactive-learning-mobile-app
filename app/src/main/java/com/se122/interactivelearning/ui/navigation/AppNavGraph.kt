@@ -109,13 +109,23 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
                             inclusive = true
                         }
                     }
+                },
+                onRegister = {
+                    navController.navigate("register")
                 }
             )
         }
         composable(
             route = NavRoutes.REGISTER
         ) {
-            RegisterScreen()
+            RegisterScreen(
+                onLoginClick = {
+                    navController.navigate("login")
+                },
+                onRegisterSuccess = {
+                    navController.navigate("login")
+                }
+            )
         }
         composable(
             route = NavRoutes.COURSE_DETAIL

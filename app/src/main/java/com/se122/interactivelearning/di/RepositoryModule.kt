@@ -11,6 +11,7 @@ import com.se122.interactivelearning.data.repository.MeetingRepositoryImpl
 import com.se122.interactivelearning.data.repository.QuestionRepositoryImpl
 import com.se122.interactivelearning.data.repository.QuizRepositoryImpl
 import com.se122.interactivelearning.data.repository.QuizSocketRepositoryImpl
+import com.se122.interactivelearning.data.repository.RegisterRepositoryImpl
 import com.se122.interactivelearning.data.repository.SessionRepositoryImpl
 import com.se122.interactivelearning.data.repository.SessionSocketRepositoryImpl
 import com.se122.interactivelearning.domain.repository.UserRepository
@@ -18,6 +19,7 @@ import com.se122.interactivelearning.data.repository.UserRepositoryImpl
 import com.se122.interactivelearning.domain.repository.QuestionRepository
 import com.se122.interactivelearning.domain.repository.QuizRepository
 import com.se122.interactivelearning.domain.repository.QuizSocketRepository
+import com.se122.interactivelearning.domain.repository.RegisterRepository
 import com.se122.interactivelearning.domain.repository.SessionRepository
 import com.se122.interactivelearning.domain.repository.SessionSocketRepository
 import dagger.Binds
@@ -88,4 +90,10 @@ abstract class RepositoryModule {
     abstract fun bindQuestionRepository(
         questionRepositoryImpl: QuestionRepositoryImpl
     ): QuestionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRegisterRepository(
+        impl: RegisterRepositoryImpl
+    ): RegisterRepository
 }
