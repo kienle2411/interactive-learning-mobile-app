@@ -41,7 +41,7 @@ fun GroupCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Hình bên trái - sử dụng icon mặc định
+            // Left - Icon
             Icon(
                 imageVector = Icons.Default.Group,
                 contentDescription = "Group Icon",
@@ -51,7 +51,7 @@ fun GroupCard(
                 tint = MaterialTheme.colorScheme.primary
             )
 
-            // Tên group + điểm
+            // Right - Context
             Column {
                 Text(
                     text = group.name,

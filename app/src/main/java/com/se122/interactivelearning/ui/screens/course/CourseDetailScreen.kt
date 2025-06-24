@@ -428,7 +428,7 @@ fun CourseDetailScreen(
                                             verticalArrangement = Arrangement.spacedBy(10.dp)
                                         ) {
                                             Text(
-                                                text = classroomDetails.description,
+                                                text = classroomDetails.name,
                                                 style = MaterialTheme.typography.titleMedium
                                             )
                                             Text(
@@ -436,10 +436,10 @@ fun CourseDetailScreen(
                                                 style = MaterialTheme.typography.bodySmall
                                             )
                                             HorizontalDivider()
-                                            Text(
-                                                text = "Teacher",
-                                                style = MaterialTheme.typography.titleMedium
-                                            )
+//                                            Text(
+//                                                text = "Teacher",
+//                                                style = MaterialTheme.typography.titleMedium
+//                                            )
                                             LazyColumn(
                                                 verticalArrangement = Arrangement.spacedBy(10.dp),
                                                 modifier = Modifier.fillMaxSize()
