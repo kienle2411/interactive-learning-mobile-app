@@ -57,6 +57,7 @@ import com.se122.interactivelearning.ui.theme.GrayPrimary
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
+    onQuizzesClick: () -> Unit,
     onJoinMeetingClick: (String) -> Unit,
     onJoinSessionClick: (String) -> Unit
 ) {
