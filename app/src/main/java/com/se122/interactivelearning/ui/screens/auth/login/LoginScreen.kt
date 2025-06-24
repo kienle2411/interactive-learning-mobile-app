@@ -46,7 +46,8 @@ import com.se122.interactivelearning.common.ViewState
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     onRegister: () -> Unit,
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
+    onForgotPassword: () -> Unit,
 ) {
     val loginState by viewModel.loginState.collectAsState()
 
@@ -98,7 +99,11 @@ fun LoginScreen(
             text = "Forgot password?",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.align(Alignment.End),
+            modifier = Modifier
+                .align(Alignment.End)
+                .clickable {
+                    onForgotPassword()
+                },
         )
         PrimaryButton(
             onClick = {

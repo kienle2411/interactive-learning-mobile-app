@@ -3,6 +3,8 @@ package com.se122.interactivelearning.data.remote.api
 import com.se122.interactivelearning.data.remote.dto.LoginRequest
 import com.se122.interactivelearning.data.remote.dto.LoginResponse
 import com.se122.interactivelearning.data.remote.dto.ProfileResponse
+import com.se122.interactivelearning.data.remote.dto.RecoveryRequest
+import com.se122.interactivelearning.data.remote.dto.RecoveryResponse
 import com.se122.interactivelearning.data.remote.dto.RegisterRequest
 import com.se122.interactivelearning.data.remote.dto.RegisterResponse
 import retrofit2.Response
@@ -21,6 +23,11 @@ interface AuthApi {
     suspend fun register(
         @Body request: RegisterRequest
     ): Response<ApiResponse<RegisterResponse>>
+
+    @POST("auth/forgot-password")
+    suspend fun sendRecoveryEmail(
+        @Body request: RecoveryRequest
+    ): Response<ApiResponse<RecoveryResponse>>
 
     @GET("users/profile")
     suspend fun getProfile(): Response<ApiResponse<ProfileResponse>>

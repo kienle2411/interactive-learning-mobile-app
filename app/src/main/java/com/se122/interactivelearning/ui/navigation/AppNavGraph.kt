@@ -25,6 +25,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.se122.interactivelearning.ui.screens.auth.login.LoginScreen
+import com.se122.interactivelearning.ui.screens.auth.recovery_password.RecoveryPasswordScreen
 import com.se122.interactivelearning.ui.screens.auth.register.RegisterScreen
 import com.se122.interactivelearning.ui.screens.course.CourseDetailScreen
 import com.se122.interactivelearning.ui.screens.course.CourseScreen
@@ -112,6 +113,9 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
                 },
                 onRegister = {
                     navController.navigate("register")
+                },
+                onForgotPassword = {
+                    navController.navigate("recovery_password")
                 }
             )
         }
@@ -124,6 +128,15 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
                 },
                 onRegisterSuccess = {
                     navController.navigate("login")
+                }
+            )
+        }
+        composable(
+            route = NavRoutes.RECOVERY_PASSWORD
+        ) {
+            RecoveryPasswordScreen (
+                onBackToLogin = {
+                    navController.popBackStack()
                 }
             )
         }
