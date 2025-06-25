@@ -1,5 +1,6 @@
 package com.se122.interactivelearning.ui.screens.quiz
 
+import android.util.Log
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,8 +23,10 @@ class InQuizViewModel @Inject constructor(
     val question = _question.asStateFlow()
 
     fun connectSocket() {
-        quizSocketRepository.connect {
-            observeQuestion()
+        viewModelScope.launch {
+            quizSocketRepository.connect {
+                observeQuestion()
+            }
         }
     }
 
@@ -33,6 +36,7 @@ class InQuizViewModel @Inject constructor(
 
     fun observeQuestion() {
         quizSocketRepository.onReceiveQuestion {
+            Log.i("InQuizViewModel", "observeQuestion: $it")
             getQuestion(it)
         }
     }

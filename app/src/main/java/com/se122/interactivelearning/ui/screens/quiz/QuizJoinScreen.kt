@@ -1,6 +1,8 @@
 package com.se122.interactivelearning.ui.screens.quiz
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -20,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
@@ -35,26 +38,28 @@ fun QuizJoinScreen(
     onStart: () -> Unit
 ) {
     val quiz by quizJoinViewModel.quiz.collectAsState()
+    val start by quizJoinViewModel.start.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(quizId) {
-        quizJoinViewModel.getQuiz(quizId)
+    LaunchedEffect(start) {
+        if (start) {
+            onStart.invoke()
+        }
     }
 
     LaunchedEffect(Unit) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            quizJoinViewModel.startEvent.collect {
-                onStart.invoke()
-            }
-        }
+        quizJoinViewModel.getQuiz(quizId)
+        quizJoinViewModel.connectSocket()
+        quizJoinViewModel.joinQuiz(quizId)
     }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
+                windowInsets = WindowInsets(0),
                 title = {
                     Text(
-                        text = (quiz as ViewState.Success).data.id,
+                        text =  if (quiz is ViewState.Success) (quiz as ViewState.Success).data.id else "",
                         style = MaterialTheme.typography.titleLarge,
                     )
                 },
@@ -73,7 +78,9 @@ fun QuizJoinScreen(
             )
         },
         bottomBar = {
-            BottomAppBar {
+            BottomAppBar(
+                windowInsets = WindowInsets(0)
+            ) {
                 Button(
                     onClick = {}
                 ) {
@@ -83,7 +90,7 @@ fun QuizJoinScreen(
         }
     ) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding).padding(20.dp)
         ) {
             LazyColumn {
 

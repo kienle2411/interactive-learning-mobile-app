@@ -11,6 +11,7 @@ interface QuizSocketRepository {
     fun joinQuiz(quizId: String)
     fun submitAnswer(quizId: String, questionId: String, answer: String)
 
+    fun onQuizStarted(callback: () -> Unit)
     fun onReceiveQuestion(callback: (questionId: String) -> Unit)
     fun onUpdateLeaderboard(callback: (leaderboard: JSONObject) -> Unit)
     fun onQuizEnded(callback: (message: String) -> Unit)

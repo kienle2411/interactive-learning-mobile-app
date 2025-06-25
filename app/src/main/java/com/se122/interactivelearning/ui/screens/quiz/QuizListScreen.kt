@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,7 +44,17 @@ fun QuizListScreen(
 
     val quizCode = remember { mutableStateOf(TextFieldValue("")) }
 
-    Scaffold { innerPadding ->
+    LaunchedEffect(attemptQuiz) {
+        if (attemptQuiz is ViewState.Success) {
+            val quizId = (attemptQuiz as ViewState.Success).data.quizId
+            onJoin(quizId)
+            quizListViewModel.resetAttemptQuiz()
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.padding(20.dp)
+    ){ innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding)
         ) {
@@ -76,10 +87,6 @@ fun QuizListScreen(
                     onClick = {
                         if (quizCode.value.text.isNotEmpty()) {
                             quizListViewModel.attemptQuiz(quizCode.value.text)
-                            if (attemptQuiz is ViewState.Success) {
-                                val quizId = (attemptQuiz as ViewState.Success).data.id
-                                onJoin(quizId)
-                            }
                         }
                     },
                     modifier = Modifier.weight(2f).height(56.dp),

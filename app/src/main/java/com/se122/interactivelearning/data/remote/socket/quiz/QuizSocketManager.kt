@@ -12,7 +12,7 @@ class QuizSocketManager @Inject constructor(
     tokenManager: TokenManager
 ): BaseSocketManager(tokenManager) {
 
-    override val namespaceUrl: String = "ws://192.168.1.8:3001/api/quiz"
+    override val namespaceUrl: String = "ws://192.168.1.7:3001/api/quiz"
 
     fun joinQuiz(quizId: String) {
         emit("joinQuiz", quizId)
@@ -32,11 +32,20 @@ class QuizSocketManager @Inject constructor(
     fun onReceiveQuestion(callback: (questionId: String) -> Unit) {
         off("receiveQuestion")
         on("receiveQuestion") { args ->
+            Log.d(TAG, "onReceiveQuestion")
             val data = args.getOrNull(0) as? JSONObject
             val question = data?.getString("question")
             if (question != null) {
                 callback(question)
             }
+        }
+    }
+
+    fun onQuizStarted(callback: () -> Unit) {
+        off("quizStarted")
+        on("quizStarted") {
+            Log.d(TAG, "onQuizStarted: ")
+            callback()
         }
     }
 

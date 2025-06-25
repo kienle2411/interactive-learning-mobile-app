@@ -1,5 +1,6 @@
 package com.se122.interactivelearning.ui.screens.quiz
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.se122.interactivelearning.common.ViewState
@@ -21,7 +22,28 @@ class QuizJoinViewModel @Inject constructor(
     private val _quiz = MutableStateFlow<ViewState<QuizResponse>>(ViewState.Idle)
     val quiz = _quiz.asStateFlow()
 
+    private val _start = MutableStateFlow<Boolean>(false)
+    val start = _start.asStateFlow()
+
     val startEvent = quizSocketRepository.startEvent
+
+    fun connectSocket() {
+        viewModelScope.launch {
+            quizSocketRepository.connect {
+                observeQuizStart()
+            }
+        }
+    }
+
+    fun observeQuizStart() {
+        quizSocketRepository.onQuizStarted {
+            _start.value = true
+        }
+    }
+
+    fun joinQuiz(id: String) {
+        quizSocketRepository.joinQuiz(id)
+    }
 
     fun getQuiz(id: String) {
         viewModelScope.launch {

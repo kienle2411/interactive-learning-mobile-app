@@ -45,8 +45,7 @@ import com.se122.interactivelearning.ui.screens.session.InSessionScreen
 fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
     NavHost(
         navController = navController,
-        startDestination = NavRoutes.HOME,
-        modifier = Modifier.padding(20.dp)
+        startDestination = NavRoutes.HOME
     ) {
         composable(
             route = NavRoutes.HOME
@@ -61,7 +60,6 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
                 onJoinSessionClick = { sessionId ->
                     navController.navigate("in_session/${sessionId}")
                 }
-
             )
         }
         composable(

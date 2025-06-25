@@ -76,7 +76,7 @@ fun CourseScreen(
     }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().padding(20.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),

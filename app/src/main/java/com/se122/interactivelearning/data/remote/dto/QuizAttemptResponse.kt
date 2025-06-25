@@ -8,6 +8,6 @@ data class QuizAttemptResponse(
     val deletedAt: String?,
     val createdAt: String,
     val updatedAt: String?,
-    val student: StudentResponse,
-    val quiz: QuizResponse,
+    val studentId: String,
+    val quizId: String,
 )

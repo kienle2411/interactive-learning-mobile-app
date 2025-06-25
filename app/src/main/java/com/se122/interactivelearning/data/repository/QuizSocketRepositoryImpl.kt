@@ -20,12 +20,11 @@ class QuizSocketRepositoryImpl @Inject constructor(
     }
 
     override fun disconnect() {
-        TODO("Not yet implemented")
+        quizSocketManager.disconnect()
     }
 
     override fun joinQuiz(quizId: String) {
         quizSocketManager.joinQuiz(quizId)
-        _startEvent.tryEmit(Unit)
     }
 
     override fun submitAnswer(
@@ -34,6 +33,11 @@ class QuizSocketRepositoryImpl @Inject constructor(
         answer: String,
     ) {
         TODO("Not yet implemented")
+    }
+
+    override fun onQuizStarted(callback: () -> Unit) {
+        quizSocketManager.onQuizStarted(callback)
+        _startEvent.tryEmit(Unit)
     }
 
     override fun onReceiveQuestion(callback: (String) -> Unit) {

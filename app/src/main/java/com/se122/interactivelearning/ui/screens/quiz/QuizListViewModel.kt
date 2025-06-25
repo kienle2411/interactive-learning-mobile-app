@@ -32,4 +32,10 @@ class QuizListViewModel @Inject constructor(
             }
         }
     }
+
+    fun resetAttemptQuiz() {
+        viewModelScope.launch {
+            _attemptQuiz.value = ViewState.Idle
+        }
+    }
 }

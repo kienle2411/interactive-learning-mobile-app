@@ -14,6 +14,6 @@ interface QuizApi {
     @POST("quiz/{id}/attempt")
     suspend fun attemptQuiz(@Path("id") id: String): Response<ApiResponse<QuizAttemptResponse>>
 
-    @POST("quiz/{code}/attempt")
+    @POST("quiz/code/{code}/attempt")
     suspend fun attemptQuizByCode(@Path("code") code: String): Response<ApiResponse<QuizAttemptResponse>>
 }
