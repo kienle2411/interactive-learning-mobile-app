@@ -236,10 +236,20 @@ class InMeetingViewModel @Inject constructor(
                    is RoomEvent.Reconnecting -> {
                        _uiToast.emit("Reconnecting...")
                    }
+//                   is RoomEvent.TrackSubscribed -> {
+//                        if (event.track is VideoTrack) {
+//                            _remoteVideoTracks.value = _remoteVideoTracks.value + (event.track as VideoTrack)
+//                        }
+//                       Log.i("Meeting", "Subscribed")
+//                   }
                    is RoomEvent.TrackSubscribed -> {
-                        if (event.track is VideoTrack) {
-                            _remoteVideoTracks.value = _remoteVideoTracks.value + (event.track as VideoTrack)
-                        }
+                       if (event.track is VideoTrack) {
+                           if (event.publication.source == Source.SCREEN_SHARE) {
+                               _remoteScreenVideo.value = event.track as VideoTrack
+                           } else {
+                               _remoteVideoTracks.value = _remoteVideoTracks.value + (event.track as VideoTrack)
+                           }
+                       }
                        Log.i("Meeting", "Subscribed")
                    }
                    is RoomEvent.DataReceived -> {

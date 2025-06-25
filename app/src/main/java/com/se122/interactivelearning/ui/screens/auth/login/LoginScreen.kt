@@ -2,6 +2,7 @@ package com.se122.interactivelearning.ui.screens.auth.login
 
 import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,7 +45,9 @@ import com.se122.interactivelearning.common.ViewState
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
-    onLoginSuccess: () -> Unit
+    onRegister: () -> Unit,
+    onLoginSuccess: () -> Unit,
+    onForgotPassword: () -> Unit,
 ) {
     val loginState by viewModel.loginState.collectAsState()
 
@@ -73,6 +76,9 @@ fun LoginScreen(
                 text = "Sign up",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.clickable {
+                    onRegister()
+                },
             )
         }
         InputIcon(
@@ -93,7 +99,11 @@ fun LoginScreen(
             text = "Forgot password?",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.align(Alignment.End),
+            modifier = Modifier
+                .align(Alignment.End)
+                .clickable {
+                    onForgotPassword()
+                },
         )
         PrimaryButton(
             onClick = {

@@ -159,13 +159,13 @@ fun ProfileScreen(
                 onEditProfileClick()
             }
         )
-        RowButton(
-            imageVector = Icons.Default.Settings,
-            text = "Settings",
-            onClick = {
-                onSettingsClick()
-            }
-        )
+//        RowButton(
+//            imageVector = Icons.Default.Settings,
+//            text = "Settings",
+//            onClick = {
+//                onSettingsClick()
+//            }
+//        )
         RowButton(
             imageVector = Icons.Default.Info,
             text = "About This App",

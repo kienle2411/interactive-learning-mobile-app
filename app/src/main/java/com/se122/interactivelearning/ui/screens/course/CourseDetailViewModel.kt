@@ -9,11 +9,13 @@ import com.se122.interactivelearning.data.remote.api.ApiResult
 import com.se122.interactivelearning.data.remote.dto.AssignmentResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomDetailsResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomStudentResponse
+import com.se122.interactivelearning.data.remote.dto.Group
 import com.se122.interactivelearning.data.remote.dto.MaterialResponse
 import com.se122.interactivelearning.data.remote.dto.MeetingResponse
 import com.se122.interactivelearning.data.remote.dto.SessionResponse
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomAssignmentsUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomDetailUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomGroupsUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomMaterialsUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomMeetingUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomSessionsUseCase
@@ -34,6 +36,7 @@ class CourseDetailViewModel @Inject constructor(
     private val getClassroomSessionsUseCase: GetClassroomSessionsUseCase,
     private val getClassroomMeetingUseCase: GetClassroomMeetingUseCase,
     private val getClassroomAssignmentsUseCase: GetClassroomAssignmentsUseCase,
+    private val getClassroomGroupsUseCase: GetClassroomGroupsUseCase,
 ): ViewModel() {
     private val _classroomDetails = MutableStateFlow<ViewState<ClassroomDetailsResponse>>(ViewState.Idle)
     val classroomDetails = _classroomDetails.asStateFlow()
@@ -55,6 +58,9 @@ class CourseDetailViewModel @Inject constructor(
 
     private val _classroomAssignments = MutableStateFlow<ViewState<List<AssignmentResponse>>>(ViewState.Idle)
     val classroomAssignments = _classroomAssignments.asStateFlow()
+
+    private val _groupsState = MutableStateFlow<ViewState<List<Group>>>(ViewState.Idle)
+    val groupsState = _groupsState.asStateFlow()
 
     init {
 
@@ -175,6 +181,27 @@ class CourseDetailViewModel @Inject constructor(
                 is ApiResult.Exception -> {
                     val msg = "Unknown error"
                     _classroomAssignments.value = Error(msg)
+                }
+            }
+        }
+    }
+
+    fun loadGroups(id: String) {
+        viewModelScope.launch {
+            _groupsState.value = ViewState.Loading
+            when (val result = getClassroomGroupsUseCase(id)) {
+                is ApiResult.Success -> {
+                    val filteredGroups = result.data.data.filter { it.deletedAt == null }
+                    _groupsState.value = ViewState.Success(filteredGroups)
+                }
+                is ApiResult.Error -> {
+                    Log.i("CourseDetailViewModel", "Group Error: $result")
+                    val msg = (result.message + " " + result.errors?.first())
+                    _groupsState.value = ViewState.Error(msg)
+                }
+                is ApiResult.Exception -> {
+                    val msg = "Unknown error"
+                    _groupsState.value = ViewState.Error(msg)
                 }
             }
         }

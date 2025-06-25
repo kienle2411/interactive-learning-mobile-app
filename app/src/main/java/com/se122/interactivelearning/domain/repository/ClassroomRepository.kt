@@ -7,6 +7,7 @@ import com.se122.interactivelearning.data.remote.dto.ClassroomDetailsResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomStudentResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomWrapperResponse
+import com.se122.interactivelearning.data.remote.dto.Group
 import com.se122.interactivelearning.data.remote.dto.MaterialResponse
 import com.se122.interactivelearning.data.remote.dto.MeetingResponse
 import com.se122.interactivelearning.data.remote.dto.SessionResponse
@@ -19,5 +20,6 @@ interface ClassroomRepository {
     suspend fun getClassroomSessions(id: String): ApiResult<PaginationResponse<SessionResponse>>
     suspend fun getClassroomMeetings(id: String): ApiResult<PaginationResponse<MeetingResponse>>
     suspend fun getClassroomAssignments(id: String): ApiResult<PaginationResponse<AssignmentResponse>>
+    suspend fun getClassroomGroups(id: String): ApiResult<PaginationResponse<Group>>
     suspend fun joinClassroom(code: String): ApiResult<ClassroomStudentResponse>
 }
