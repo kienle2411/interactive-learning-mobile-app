@@ -16,12 +16,7 @@ import javax.inject.Singleton
 class SessionSocketManager @Inject constructor(
     tokenManager: TokenManager
 ): BaseSocketManager(tokenManager) {
-
-<<<<<<< HEAD
     override val namespaceUrl: String = "ws://192.168.1.7:3001/api/session"
-=======
-    override val namespaceUrl: String = "ws://192.168.2.1:3001/api/session"
->>>>>>> 42c9b384c0498a655f1d3b0ae12dd3c1c845a6dd
 
     fun joinSession(sessionId: String) {
         emit("joinSession", sessionId)

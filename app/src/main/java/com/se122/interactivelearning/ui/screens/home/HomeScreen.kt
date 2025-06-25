@@ -134,15 +134,10 @@ fun HomeScreen(
                 )
                 HexagonIconButton(
                     modifier = Modifier.weight(1f),
-<<<<<<< HEAD
                     onClick = {
                         onQuizzesClick()
                     },
                     text = "My Quizzes",
-=======
-                    onClick = { onQuizzesClick() },
-                    text = "Quizzes",
->>>>>>> 42c9b384c0498a655f1d3b0ae12dd3c1c845a6dd
                     icon = {
                         Icon(
                             tint = Color.White,
