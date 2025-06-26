@@ -36,7 +36,6 @@ fun HexagonIconButton(
             .clip(RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .background(Color.White)
-            .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
             .padding(10.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically

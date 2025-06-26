@@ -21,6 +21,7 @@ object NavRoutes {
     const val QUIZ_JOIN = "quiz_join/{id}"
     const val IN_QUIZ = "in_quiz/{id}"
     const val QUIZZES = "quizzes"
+    const val QUIZ_SUMMARY = "quiz_summary"
 
     const val RECOVERY_PASSWORD = "recovery_password"
 }

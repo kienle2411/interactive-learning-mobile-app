@@ -1,8 +1,11 @@
 package com.se122.interactivelearning.data.remote.socket.quiz
 
 import android.util.Log
+import com.google.gson.Gson
+import com.se122.interactivelearning.data.remote.dto.UserResponse
 import com.se122.interactivelearning.data.remote.socket.base.BaseSocketManager
 import com.se122.interactivelearning.utils.TokenManager
+import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -64,6 +67,22 @@ class QuizSocketManager @Inject constructor(
             val message = data?.getString("message")
             if (message != null) {
                 callback(message)
+            }
+        }
+    }
+
+    fun onRoomJoined(callback: (socketId: String, user: UserResponse) -> Unit) {
+        off("roomJoined")
+        on("roomJoined") {
+            Log.d(TAG, "onRoomJoined: ")
+            val data = it.getOrNull(0) as? JSONArray
+            for (i in 0 until data!!.length()) {
+                val item = data.getJSONObject(i)
+                val socketId = item.getString("id")
+                Log.d(TAG, "onRoomJoined: $socketId")
+                val userJson = item.getJSONObject("user")
+                val user = Gson().fromJson(userJson.toString(), UserResponse::class.java)
+                callback(socketId, user)
             }
         }
     }

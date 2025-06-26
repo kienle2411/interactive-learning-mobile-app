@@ -1,10 +1,9 @@
 package com.se122.interactivelearning.domain.repository
 
-import kotlinx.coroutines.flow.SharedFlow
+import com.se122.interactivelearning.data.remote.dto.UserResponse
 import org.json.JSONObject
 
 interface QuizSocketRepository {
-    val startEvent: SharedFlow<Unit>
     fun connect(onConnected: () -> Unit)
     fun disconnect()
 
@@ -15,4 +14,5 @@ interface QuizSocketRepository {
     fun onReceiveQuestion(callback: (questionId: String) -> Unit)
     fun onUpdateLeaderboard(callback: (leaderboard: JSONObject) -> Unit)
     fun onQuizEnded(callback: (message: String) -> Unit)
+    fun onRoomJoined(callback: (socketId: String, user: UserResponse) -> Unit)
 }

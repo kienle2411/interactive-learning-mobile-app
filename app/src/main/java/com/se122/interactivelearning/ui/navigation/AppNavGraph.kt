@@ -39,6 +39,7 @@ import com.se122.interactivelearning.ui.screens.profile.ProfileScreen
 import com.se122.interactivelearning.ui.screens.quiz.InQuizScreen
 import com.se122.interactivelearning.ui.screens.quiz.QuizJoinScreen
 import com.se122.interactivelearning.ui.screens.quiz.QuizListScreen
+import com.se122.interactivelearning.ui.screens.quiz.QuizSummaryScreen
 import com.se122.interactivelearning.ui.screens.session.InSessionScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -222,7 +223,10 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
             val quizId = backStackEntry.arguments?.getString("id")
             InQuizScreen(
                 quizId = quizId.toString(),
-                onBackClick = {}
+                onBackClick = {},
+                onEndedQuiz = {
+                    navController.navigate("quiz_summary")
+                }
             )
         }
         composable(
@@ -233,6 +237,11 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
                     navController.navigate("quiz_join/${it}")
                 }
             )
+        }
+        composable(
+            route = NavRoutes.QUIZ_SUMMARY
+        ) {
+            QuizSummaryScreen()
         }
     }
 }

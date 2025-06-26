@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -35,8 +36,15 @@ fun MultipleChoiceQuestion(questionData: QuestionResponse) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text(text = questionData.content, style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Score: ${questionData.score} points")
-
+        AssistChip(
+            modifier = Modifier.align(Alignment.End),
+            onClick = {},
+            label = {
+                Text(
+                    text = "${questionData.score} points"
+                )
+            }
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
         visibleOptions.forEach { option ->

@@ -58,6 +58,8 @@ import com.se122.interactivelearning.ui.theme.GreenPrimary
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.se122.interactivelearning.ui.components.MaterialCard
 import com.se122.interactivelearning.ui.components.StudentCard
@@ -84,7 +86,6 @@ fun CourseDetailScreen(
     val classroomMaterials by viewModel.classroomMaterials.collectAsState()
     val classroomSessions by viewModel.classroomSessions.collectAsState()
     val classroomMeetings by viewModel.classroomMeetings.collectAsState()
-    val classroomAssignments by viewModel.classroomAssignments.collectAsState()
     val fileDownloadLink by viewModel.fileDownloadLink.collectAsState()
     val groupsState by viewModel.groupsState.collectAsState()
 
@@ -141,15 +142,6 @@ fun CourseDetailScreen(
         }
     }
 
-//    LaunchedEffect(classroomAssignments) {
-//        if (pagerState.currentPage == 2) {
-//            when (classroomAssignments) {
-//                is ViewState.Success, is ViewState.Error -> refreshingStates[2].value = false
-//                else -> {}
-//            }
-//        }
-//    }
-
     LaunchedEffect(groupsState) {
         if (pagerState.currentPage == 2) {
             when (groupsState) {
@@ -180,7 +172,7 @@ fun CourseDetailScreen(
     when (classroomDetails) {
         is ViewState.Error -> {
             val msg = (classroomDetails as ViewState.Error).message ?: "Unknown error"
-            Text(msg, color = androidx.compose.ui.graphics.Color.Red)
+            Text(msg, color = Color.Red)
         }
         is ViewState.Loading -> {
             Box(
@@ -196,7 +188,7 @@ fun CourseDetailScreen(
             val classroomDetails = (classroomDetails as ViewState.Success).data
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize().padding(20.dp)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -424,7 +416,7 @@ fun CourseDetailScreen(
                                     is ViewState.Success -> {
                                         val classroomStudents = (classroomStudents as ViewState.Success).data
                                         Column(
-                                            modifier = Modifier.fillMaxSize(),
+                                            modifier = Modifier.fillMaxSize().padding(horizontal = 5.dp),
                                             verticalArrangement = Arrangement.spacedBy(10.dp)
                                         ) {
                                             Text(

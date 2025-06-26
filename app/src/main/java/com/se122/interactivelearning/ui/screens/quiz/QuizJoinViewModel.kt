@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.se122.interactivelearning.common.ViewState
 import com.se122.interactivelearning.data.remote.api.ApiResult
 import com.se122.interactivelearning.data.remote.dto.QuizResponse
+import com.se122.interactivelearning.data.remote.dto.UserResponse
 import com.se122.interactivelearning.domain.repository.QuizSocketRepository
+import com.se122.interactivelearning.domain.usecase.question.GetQuestionUseCase
 import com.se122.interactivelearning.domain.usecase.quiz.GetQuizInformationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +27,8 @@ class QuizJoinViewModel @Inject constructor(
     private val _start = MutableStateFlow<Boolean>(false)
     val start = _start.asStateFlow()
 
-    val startEvent = quizSocketRepository.startEvent
+    private val _userList = MutableStateFlow<List<UserResponse>>(emptyList())
+    val userList = _userList.asStateFlow()
 
     fun connectSocket() {
         viewModelScope.launch {
@@ -56,6 +59,33 @@ class QuizJoinViewModel @Inject constructor(
                     _quiz.value = ViewState.Error("Error")
                 }
             }
+        }
+    }
+
+    fun observeRoomJoined() {
+        viewModelScope.launch {
+            quizSocketRepository.onRoomJoined { id, user ->
+                Log.i("QuizJoinViewModel", "observeRoomJoined: $id, $user")
+                val currentList = _userList.value.toMutableList()
+                val isExist = currentList.any { it.id == user.id }
+
+                if (!isExist) {
+                    currentList.add(user)
+                    _userList.value = currentList
+                }
+            }
+        }
+    }
+
+    fun disconnect() {
+        viewModelScope.launch {
+            quizSocketRepository.disconnect()
+        }
+    }
+
+    fun resetStart() {
+        viewModelScope.launch {
+            _start.value = false
         }
     }
 }

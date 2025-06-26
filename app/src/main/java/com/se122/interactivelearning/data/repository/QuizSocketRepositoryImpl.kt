@@ -1,5 +1,6 @@
 package com.se122.interactivelearning.data.repository
 
+import com.se122.interactivelearning.data.remote.dto.UserResponse
 import com.se122.interactivelearning.data.remote.socket.quiz.QuizSocketManager
 import com.se122.interactivelearning.domain.repository.QuizSocketRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,9 +13,6 @@ import javax.inject.Singleton
 class QuizSocketRepositoryImpl @Inject constructor(
     private val quizSocketManager: QuizSocketManager
 ): QuizSocketRepository {
-    private val _startEvent = MutableSharedFlow<Unit>(0)
-    override val startEvent = _startEvent.asSharedFlow()
-
     override fun connect(onConnected: () -> Unit) {
         quizSocketManager.connect(onConnected)
     }
@@ -37,7 +35,6 @@ class QuizSocketRepositoryImpl @Inject constructor(
 
     override fun onQuizStarted(callback: () -> Unit) {
         quizSocketManager.onQuizStarted(callback)
-        _startEvent.tryEmit(Unit)
     }
 
     override fun onReceiveQuestion(callback: (String) -> Unit) {
@@ -49,7 +46,10 @@ class QuizSocketRepositoryImpl @Inject constructor(
     }
 
     override fun onQuizEnded(callback: (String) -> Unit) {
-        TODO("Not yet implemented")
+        quizSocketManager.onQuizEnded(callback)
     }
 
+    override fun onRoomJoined(callback: (String, UserResponse) -> Unit) {
+        quizSocketManager.onRoomJoined(callback)
+    }
 }
