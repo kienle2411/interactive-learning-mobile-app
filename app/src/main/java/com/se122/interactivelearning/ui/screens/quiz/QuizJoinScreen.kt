@@ -91,17 +91,6 @@ fun QuizJoinScreen(
                     }
                 }
             )
-        },
-        bottomBar = {
-            BottomAppBar(
-                windowInsets = WindowInsets(0)
-            ) {
-                Button(
-                    onClick = {}
-                ) {
-                    Text(text = "Join")
-                }
-            }
         }
     ) { innerPadding ->
         Column(

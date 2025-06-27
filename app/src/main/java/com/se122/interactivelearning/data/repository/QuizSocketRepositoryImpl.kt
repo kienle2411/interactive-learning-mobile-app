@@ -2,6 +2,7 @@ package com.se122.interactivelearning.data.repository
 
 import com.se122.interactivelearning.data.remote.dto.UserResponse
 import com.se122.interactivelearning.data.remote.socket.quiz.QuizSocketManager
+import com.se122.interactivelearning.domain.model.QuizLeaderboardEntry
 import com.se122.interactivelearning.domain.repository.QuizSocketRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -28,9 +29,9 @@ class QuizSocketRepositoryImpl @Inject constructor(
     override fun submitAnswer(
         quizId: String,
         questionId: String,
-        answer: String,
+        optionId: String,
     ) {
-        TODO("Not yet implemented")
+        quizSocketManager.submitAnswer(quizId, questionId, optionId)
     }
 
     override fun onQuizStarted(callback: () -> Unit) {
@@ -41,8 +42,8 @@ class QuizSocketRepositoryImpl @Inject constructor(
         quizSocketManager.onReceiveQuestion(callback)
     }
 
-    override fun onUpdateLeaderboard(callback: (JSONObject) -> Unit) {
-        TODO("Not yet implemented")
+    override fun onUpdateLeaderboard(callback: (leaderboard: List<QuizLeaderboardEntry>) -> Unit) {
+        quizSocketManager.onUpdateLeaderboard(callback)
     }
 
     override fun onQuizEnded(callback: (String) -> Unit) {

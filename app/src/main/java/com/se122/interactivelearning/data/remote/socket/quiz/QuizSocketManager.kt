@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.se122.interactivelearning.data.remote.dto.UserResponse
 import com.se122.interactivelearning.data.remote.socket.base.BaseSocketManager
+import com.se122.interactivelearning.domain.model.QuizLeaderboardEntry
 import com.se122.interactivelearning.utils.TokenManager
 import org.json.JSONArray
 import org.json.JSONObject
@@ -15,21 +16,21 @@ class QuizSocketManager @Inject constructor(
     tokenManager: TokenManager
 ): BaseSocketManager(tokenManager) {
 
-    override val namespaceUrl: String = "ws://192.168.1.7:3001/api/quiz"
+    override val namespaceUrl: String = "ws://192.168.1.6:3001/api/quiz"
 
     fun joinQuiz(quizId: String) {
         emit("joinQuiz", quizId)
         Log.d(TAG, "joinQuiz: $quizId")
     }
 
-    fun submitAnswer(quizId: String,questionId: String, answer: String) {
+    fun submitAnswer(quizId: String,questionId: String, optionId: String) {
         val json = JSONObject().apply {
             put("quizId", quizId)
             put("questionId", questionId)
-            put("answer", answer)
+            put("optionId", optionId)
         }
         emit("submitAnswer", json)
-        Log.d(TAG, "submitAnswer: $quizId, $questionId, $answer")
+        Log.d(TAG, "submitAnswer: $quizId, $questionId, $optionId")
     }
 
     fun onReceiveQuestion(callback: (questionId: String) -> Unit) {
@@ -52,11 +53,22 @@ class QuizSocketManager @Inject constructor(
         }
     }
 
-    fun onUpdateLeaderBoard(callback: (leaderboard: JSONObject) -> Unit) {
-        off("updateLeaderBoard")
-        on("updateLeaderBoard") { args ->
-            val data = args.getOrNull(0) as? JSONObject
-            data?.let { callback(it) }
+    fun onUpdateLeaderboard(callback: (List<QuizLeaderboardEntry>) -> Unit) {
+        off("updateLeaderboard")
+        on("updateLeaderboard") { args ->
+            Log.d(TAG, "onUpdateLeaderboard: ")
+            val data = args.getOrNull(0) as? JSONArray ?: return@on
+            val leaderboard = mutableListOf<QuizLeaderboardEntry>()
+            for (i in 0 until data.length()) {
+                val item = data.getJSONObject(i)
+                val entry = QuizLeaderboardEntry(
+                    studentId = item.getString("studentId"),
+                    username = item.getString("username"),
+                    score = item.getInt("score")
+                )
+                leaderboard.add(entry)
+            }
+            callback(leaderboard)
         }
     }
 

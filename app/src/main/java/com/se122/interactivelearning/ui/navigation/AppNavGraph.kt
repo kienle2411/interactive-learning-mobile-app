@@ -241,7 +241,11 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
         composable(
             route = NavRoutes.QUIZ_SUMMARY
         ) {
-            QuizSummaryScreen()
+            QuizSummaryScreen(
+                onBack = {
+                    navController.navigate("home")
+                }
+            )
         }
     }
 }

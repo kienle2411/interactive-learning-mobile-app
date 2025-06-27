@@ -26,7 +26,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     @Provides
-    fun provideBaseUrl() = "http://192.168.1.7:3001/api/"
+    fun provideBaseUrl() = "http://192.168.1.6:3001/api/"
 
     @Provides
     @Singleton

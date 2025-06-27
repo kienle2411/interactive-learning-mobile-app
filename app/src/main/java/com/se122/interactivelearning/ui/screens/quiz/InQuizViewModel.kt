@@ -57,6 +57,12 @@ class InQuizViewModel @Inject constructor(
         }
     }
 
+    fun submitAnswer(quizId: String, questionId: String, optionId: String) {
+        viewModelScope.launch {
+            quizSocketRepository.submitAnswer(quizId, questionId, optionId)
+        }
+    }
+
     fun getQuestion(questionId: String) {
         viewModelScope.launch {
             Log.i("InQuizViewModel", "getQuestion: $questionId")

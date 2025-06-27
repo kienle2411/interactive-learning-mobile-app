@@ -38,12 +38,9 @@ fun InQuizScreen(
     val timeLeft by inQuizViewModel.countdownTime.collectAsState()
     val end by inQuizViewModel.end.collectAsState()
 
-    DisposableEffect(Unit) {
+    LaunchedEffect(Unit) {
         inQuizViewModel.observeQuestion()
         inQuizViewModel.observeEndQuiz()
-        onDispose {
-            inQuizViewModel.disconnect()
-        }
     }
 
     LaunchedEffect(end) {
@@ -97,7 +94,10 @@ fun InQuizScreen(
                 is ViewState.Success -> {
                     val question = (question as ViewState.Success).data
                     MultipleChoiceQuestion(
-                        questionData = question
+                        questionData = question,
+                        onQuestionAnswered = { optionId ->
+                            inQuizViewModel.submitAnswer(quizId, question.id, optionId)
+                        }
                     )
                 }
                 else -> {}
