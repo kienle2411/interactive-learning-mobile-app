@@ -61,6 +61,9 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
                 },
                 onJoinSessionClick = { sessionId ->
                     navController.navigate("in_session/${sessionId}")
+                },
+                onJoinClassroom = {
+                    navController.navigate("course");
                 }
             )
         }
@@ -76,7 +79,12 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
         composable(
             route = NavRoutes.NOTIFICATION
         ) {
-            NotificationScreen()
+//            NotificationScreen()
+            QuizListScreen(
+                onJoin = {
+                    navController.navigate("quiz_join/${it}")
+                }
+            )
         }
         composable(
             route = NavRoutes.PROFILE
@@ -211,7 +219,9 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
             QuizJoinScreen(
                 quizId = quizId.toString(),
                 onJoinClick = {},
-                onBackClick = {},
+                onBackClick = {
+                    navController.popBackStack()
+                },
                 onStart = {
                     navController.navigate("in_quiz/${quizId}")
                 }

@@ -4,14 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -41,7 +40,6 @@ fun QuizListScreen(
     onJoin: (String) -> Unit
 ) {
     val attemptQuiz by quizListViewModel.attemptQuiz.collectAsState()
-
     val quizCode = remember { mutableStateOf(TextFieldValue("")) }
 
     LaunchedEffect(attemptQuiz) {
@@ -53,59 +51,84 @@ fun QuizListScreen(
     }
 
     Scaffold(
-        modifier = Modifier.padding(20.dp)
-    ){ innerPadding ->
+        modifier = Modifier.fillMaxSize()
+    ) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(innerPadding)
+                .navigationBarsPadding()
+                .fillMaxSize()
+                .padding(20.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
             ) {
-                TextField(
-                    value = quizCode.value,
-                    modifier = Modifier.weight(5f),
-                    onValueChange = {
-                        quizCode.value = it
-                    },
-                    label = {
-                        Text("Quiz Code")
-                    },
-                    trailingIcon = {
-                        IconButton(
-                            onClick = {}
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_qr_scan),
-                                contentDescription = "Search"
-                            )
-                        }
-                    }
+                androidx.compose.foundation.Image(
+                    painter = painterResource(id = R.drawable.quiz_img),
+                    contentDescription = "Banner",
+                    modifier = Modifier.fillMaxSize()
                 )
-                Button(
-                    onClick = {
-                        if (quizCode.value.text.isNotEmpty()) {
-                            quizListViewModel.attemptQuiz(quizCode.value.text)
-                        }
-                    },
-                    modifier = Modifier.weight(2f).height(56.dp),
-                    shape = RoundedCornerShape(10.dp)
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    when (attemptQuiz) {
-                        is ViewState.Loading -> {
-                            CircularProgressIndicator(
-                                color = MaterialTheme.colorScheme.surface,
-                            )
+                    TextField(
+                        value = quizCode.value,
+                        modifier = Modifier
+                            .weight(5f)
+                            .height(56.dp),
+                        onValueChange = {
+                            quizCode.value = it
+                        },
+                        label = {
+                            Text("Quiz Code")
+                        },
+                        trailingIcon = {
+                            IconButton(onClick = { /* QR code action */ }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_qr_scan),
+                                    contentDescription = "Scan"
+                                )
+                            }
                         }
-                        else -> {
-                            Text(
-                                text = "Join",
+                    )
+                    Button(
+                        onClick = {
+                            if (quizCode.value.text.isNotEmpty()) {
+                                quizListViewModel.attemptQuiz(quizCode.value.text)
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(2f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        when (attemptQuiz) {
+                            is ViewState.Loading -> CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.surface,
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp
                             )
+                            else -> Text("Join")
                         }
                     }
                 }
             }
+
+            Box(modifier = Modifier.height(100.dp))
         }
     }
 }

@@ -58,6 +58,7 @@ import com.se122.interactivelearning.ui.theme.GrayPrimary
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onQuizzesClick: () -> Unit,
+    onJoinClassroom: () -> Unit,
     onJoinMeetingClick: (String) -> Unit,
     onJoinSessionClick: (String) -> Unit
 ) {
@@ -122,7 +123,9 @@ fun HomeScreen(
             ) {
                 HexagonIconButton(
                     modifier = Modifier.weight(1f),
-                    onClick = {},
+                    onClick = {
+                        onJoinClassroom()
+                    },
                     text = "My Classrooms",
                     icon = {
                         Icon(
@@ -147,67 +150,6 @@ fun HomeScreen(
                     }
                 )
 
-            }
-
-            Column {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    HexagonIconButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = {},
-                        text = "My Classrooms",
-                        icon = {
-                            Icon(
-                                tint = Color.White,
-                                painter = painterResource(R.drawable.ic_course),
-                                contentDescription = "icon"
-                            )
-                        }
-                    )
-                    HexagonIconButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = {},
-                        text = "Quizzes",
-                        icon = {
-                            Icon(
-                                tint = Color.White,
-                                painter = painterResource(R.drawable.ic_user),
-                                contentDescription = "icon"
-                            )
-                        }
-                    )
-                }
-            }
-            Column {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    HexagonIconButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = {},
-                        text = "My Classrooms",
-                        icon = {
-                            Icon(
-                                tint = Color.White,
-                                painter = painterResource(R.drawable.ic_course),
-                                contentDescription = "icon"
-                            )
-                        }
-                    )
-                    HexagonIconButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = {},
-                        text = "Quizzes",
-                        icon = {
-                            Icon(
-                                tint = Color.White,
-                                painter = painterResource(R.drawable.ic_user),
-                                contentDescription = "icon"
-                            )
-                        }
-                    )
-                }
             }
 
 

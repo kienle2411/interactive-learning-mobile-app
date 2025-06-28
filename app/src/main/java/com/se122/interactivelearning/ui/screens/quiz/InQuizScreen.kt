@@ -88,7 +88,7 @@ fun InQuizScreen(
         }
     ) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding).padding(top = 16.dp)
         ) {
             when (question) {
                 is ViewState.Success -> {

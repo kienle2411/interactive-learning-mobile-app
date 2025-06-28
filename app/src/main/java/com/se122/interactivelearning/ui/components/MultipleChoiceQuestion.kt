@@ -85,15 +85,14 @@ fun MultipleChoiceQuestion(questionData: QuestionResponse, onQuestionAnswered: (
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button (
+        PrimaryButton (
             onClick = {
                 submitted = true
                 selectedOptionId?.let { onQuestionAnswered(it) }
             },
-            enabled = selectedOptionId != null && !submitted
-        ) {
-            Text("Submit")
-        }
+            enabled = selectedOptionId != null && !submitted,
+            text = "Submit"
+        )
 
         if (submitted && selectedOptionId != null) {
             val isCorrect = visibleOptions.find { it.id == selectedOptionId }?.isCorrect ?: false

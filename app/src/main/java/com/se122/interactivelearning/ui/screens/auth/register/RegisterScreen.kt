@@ -270,13 +270,19 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             Row {
-                Text("Already have an account?")
+//                Text("Already have an account?")
                 Text(
-                    " Login",
+                    text = "Already have an account? ",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Login",
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .padding(start = 4.dp)
-                        .clickable { onLoginClick() }
+                    modifier = Modifier.clickable {
+                        onLoginClick()
+                    },
                 )
             }
         }

@@ -1,12 +1,15 @@
 package com.se122.interactivelearning.ui.screens.quiz
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.se122.interactivelearning.R
 import androidx.lifecycle.Lifecycle
@@ -73,7 +77,7 @@ fun QuizJoinScreen(
                 windowInsets = WindowInsets(0),
                 title = {
                     Text(
-                        text =  if (quiz is ViewState.Success) (quiz as ViewState.Success).data.title else "",
+                        text = if (quiz is ViewState.Success) (quiz as ViewState.Success).data.title else "",
                         style = MaterialTheme.typography.titleMedium,
                     )
                 },
@@ -94,21 +98,46 @@ fun QuizJoinScreen(
         }
     ) { innerPadding ->
         Column(
-            modifier = Modifier.fillMaxWidth().padding(innerPadding).padding(20.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Waiting for players to join..."
+            Image(
+                painter = painterResource(id = R.drawable.quiz_img), // 🔁 Thay tên ảnh phù hợp
+                contentDescription = "Quiz Banner",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
             )
+
+            Text(
+                text = "Waiting lounge",
+                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Text(
+                text = "Waiting for players to join...",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
             FlowRow(
-                modifier = Modifier.fillMaxWidth().padding(8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
             ) {
                 userList.forEach {
                     Card(
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier
+                            .padding(8.dp)
                     ) {
                         Row(
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(8.dp)
                         ) {
                             AsyncImage(
                                 model = it.avatarUrl ?: R.drawable.img_avatar,
@@ -116,8 +145,8 @@ fun QuizJoinScreen(
                                 modifier = Modifier.size(50.dp)
                             )
                             Text(
-                                text = it.firstName + " " + it.lastName,
-                                modifier = Modifier.padding(horizontal = 5.dp)
+                                text = "${it.firstName} ${it.lastName}",
+                                modifier = Modifier.padding(start = 8.dp)
                             )
                         }
                     }
