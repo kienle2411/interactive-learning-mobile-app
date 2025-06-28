@@ -1,5 +1,6 @@
 package com.se122.interactivelearning.di
 
+import com.se122.interactivelearning.data.repository.AnswerRepositoryImpl
 import com.se122.interactivelearning.domain.repository.ClassroomRepository
 import com.se122.interactivelearning.data.repository.ClassroomRepositoryImpl
 import com.se122.interactivelearning.domain.repository.FileRepository
@@ -16,6 +17,7 @@ import com.se122.interactivelearning.data.repository.SessionRepositoryImpl
 import com.se122.interactivelearning.data.repository.SessionSocketRepositoryImpl
 import com.se122.interactivelearning.domain.repository.UserRepository
 import com.se122.interactivelearning.data.repository.UserRepositoryImpl
+import com.se122.interactivelearning.domain.repository.AnswerRepository
 import com.se122.interactivelearning.domain.repository.QuestionRepository
 import com.se122.interactivelearning.domain.repository.QuizRepository
 import com.se122.interactivelearning.domain.repository.QuizSocketRepository
@@ -96,4 +98,10 @@ abstract class RepositoryModule {
     abstract fun bindRegisterRepository(
         impl: RegisterRepositoryImpl
     ): RegisterRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAnswerRepository(
+        answerRepositoryImpl: AnswerRepositoryImpl
+    ): AnswerRepository
 }

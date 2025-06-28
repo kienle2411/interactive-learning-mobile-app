@@ -28,7 +28,14 @@ class QuizListViewModel @Inject constructor(
                 is ApiResult.Success -> {
                     _attemptQuiz.value = ViewState.Success(result.data)
                 }
-                else -> {}
+                is ApiResult.Error -> {
+                    val msg = (result.message)
+                    _attemptQuiz.value = ViewState.Error(msg)
+                }
+                is ApiResult.Exception -> {
+                    val msg = "Unknown error"
+                    _attemptQuiz.value = ViewState.Error(msg)
+                }
             }
         }
     }

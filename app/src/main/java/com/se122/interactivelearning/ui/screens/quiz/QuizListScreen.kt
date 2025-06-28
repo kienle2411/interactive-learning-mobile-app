@@ -1,5 +1,8 @@
 package com.se122.interactivelearning.ui.screens.quiz
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,8 +14,10 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,12 +33,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.zIndex
 import com.se122.interactivelearning.R
 import com.se122.interactivelearning.common.ViewState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizListScreen(
     quizListViewModel: QuizListViewModel = hiltViewModel(),
@@ -42,32 +51,38 @@ fun QuizListScreen(
     val attemptQuiz by quizListViewModel.attemptQuiz.collectAsState()
     val quizCode = remember { mutableStateOf(TextFieldValue("")) }
 
+    val showErrorDialog = remember { mutableStateOf(false) }
+    val errorMessage = remember { mutableStateOf("") }
+
     LaunchedEffect(attemptQuiz) {
         if (attemptQuiz is ViewState.Success) {
             val quizId = (attemptQuiz as ViewState.Success).data.quizId
             onJoin(quizId)
             quizListViewModel.resetAttemptQuiz()
         }
+        if (attemptQuiz is ViewState.Error) {
+            errorMessage.value = (attemptQuiz as ViewState.Error).message ?: "Unknown error"
+            showErrorDialog.value = true
+        }
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize()
-    ) { innerPadding ->
+    Box(
+        modifier = Modifier.fillMaxSize().padding(20.dp)
+    ) {
         Column(
             modifier = Modifier
-                .padding(innerPadding)
                 .navigationBarsPadding()
-                .fillMaxSize()
-                .padding(20.dp),
+                .fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Box(
                 modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
                     .fillMaxWidth()
                     .height(200.dp)
             ) {
-                androidx.compose.foundation.Image(
+                Image(
                     painter = painterResource(id = R.drawable.quiz_img),
                     contentDescription = "Banner",
                     modifier = Modifier.fillMaxSize()
@@ -96,14 +111,6 @@ fun QuizListScreen(
                         label = {
                             Text("Quiz Code")
                         },
-                        trailingIcon = {
-                            IconButton(onClick = { /* QR code action */ }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_qr_scan),
-                                    contentDescription = "Scan"
-                                )
-                            }
-                        }
                     )
                     Button(
                         onClick = {
@@ -127,8 +134,36 @@ fun QuizListScreen(
                     }
                 }
             }
-
             Box(modifier = Modifier.height(100.dp))
+        }
+
+        if (attemptQuiz is ViewState.Loading) {
+            Dialog(
+                onDismissRequest = {}
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        if (showErrorDialog.value) {
+            BasicAlertDialog(
+                onDismissRequest = {
+                    showErrorDialog.value = false
+                },
+                modifier = Modifier
+                    .zIndex(1f)
+                    .clip(RoundedCornerShape(5.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(5.dp))
+                    .background(MaterialTheme.colorScheme.background),
+                content = {
+                    Box {
+                        Text(
+                            modifier = Modifier.padding(10.dp),
+                            text = errorMessage.value,
+                        )
+                    }
+                }
+            )
         }
     }
 }

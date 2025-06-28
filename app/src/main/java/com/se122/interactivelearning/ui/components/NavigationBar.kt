@@ -118,6 +118,6 @@ data class NavBarItem(
 val NavBarList = listOf(
     NavBarItem("Home", R.drawable.ic_home, R.drawable.ic_home_fill, "home"),
     NavBarItem("Course", R.drawable.ic_course, R.drawable.ic_course_fill, "course"),
-    NavBarItem("Notification", R.drawable.ic_notification, R.drawable.ic_notification_fill, "notification"),
+    NavBarItem("Quiz", R.drawable.ic_quiz, R.drawable.ic_quiz_fill, "quizzes"),
     NavBarItem("Profile", R.drawable.ic_user, R.drawable.ic_user_fill, "profile")
 )

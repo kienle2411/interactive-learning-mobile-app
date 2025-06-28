@@ -16,12 +16,16 @@ class SessionSocketRepositoryImpl @Inject constructor(
         sessionSocketManager.joinSession(sessionId)
     }
 
-    override fun onSlideReceived(callback: (slideUrl: String) -> Unit) {
+    override fun onSlideReceived(callback: (slideUrl: String, slidePageId: String) -> Unit) {
         sessionSocketManager.onSlideReceived(callback)
     }
 
     override fun onMessageReceived(callback: (ChatMessageSession) -> Unit) {
         sessionSocketManager.onMessageReceived(callback)
+    }
+
+    override fun onQuestionReceived(callback: (questionId: String) -> Unit) {
+        sessionSocketManager.onQuestionReceived(callback)
     }
 
     override fun sendMessage(sessionId: String, message: String) {

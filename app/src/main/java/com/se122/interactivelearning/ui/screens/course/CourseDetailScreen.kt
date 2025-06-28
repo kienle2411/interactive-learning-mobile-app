@@ -290,20 +290,32 @@ fun CourseDetailScreen(
                                 when (classroomSessions) {
                                     is ViewState.Success -> {
                                         val classroomSessions = (classroomSessions as ViewState.Success).data
-                                        LazyColumn(
-                                            modifier = Modifier.fillMaxSize(),
-                                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                                        ) {
-                                            items(
-                                                items = classroomSessions,
-                                                key = { it -> it.id }
+                                        if (classroomSessions.isEmpty()) {
+                                            Box(
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentAlignment = Alignment.Center
                                             ) {
-                                                SessionCard(
-                                                    session = it,
-                                                    onJoinClick = { id ->
-                                                        onJoinSessionClick(id)
-                                                    }
+                                                Text(
+                                                    text = "No sessions",
+                                                    style = MaterialTheme.typography.titleMedium
                                                 )
+                                            }
+                                        } else {
+                                            LazyColumn(
+                                                modifier = Modifier.fillMaxSize(),
+                                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                                            ) {
+                                                items(
+                                                    items = classroomSessions,
+                                                    key = { it -> it.id }
+                                                ) {
+                                                    SessionCard(
+                                                        session = it,
+                                                        onJoinClick = { id ->
+                                                            onJoinSessionClick(id)
+                                                        }
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -322,20 +334,32 @@ fun CourseDetailScreen(
                                 when (classroomMeetings) {
                                     is ViewState.Success -> {
                                         val classroomMeetings = (classroomMeetings as ViewState.Success).data
-                                        LazyColumn(
-                                            modifier = Modifier.fillMaxSize(),
-                                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                                        ) {
-                                            items(
-                                                items = classroomMeetings,
-                                                key = { it -> it.id }
+                                        if (classroomMeetings.isEmpty()) {
+                                            Box(
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentAlignment = Alignment.Center
                                             ) {
-                                                MeetingCard(
-                                                    meeting = it,
-                                                    onJoinClick = { id ->
-                                                        onJoinMeetingClick(id)
-                                                    }
+                                                Text(
+                                                    text = "No meetings",
+                                                    style = MaterialTheme.typography.titleMedium
                                                 )
+                                            }
+                                        } else {
+                                            LazyColumn(
+                                                modifier = Modifier.fillMaxSize(),
+                                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                                            ) {
+                                                items(
+                                                    items = classroomMeetings,
+                                                    key = { it -> it.id }
+                                                ) {
+                                                    MeetingCard(
+                                                        meeting = it,
+                                                        onJoinClick = { id ->
+                                                            onJoinMeetingClick(id)
+                                                        }
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -354,17 +378,29 @@ fun CourseDetailScreen(
                                 when (groupsState) {
                                     is ViewState.Success -> {
                                         val classroomAssignments = (groupsState as ViewState.Success).data
-                                        LazyColumn(
-                                            modifier = Modifier.fillMaxSize(),
-                                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                                        ) {
-                                            items(
-                                                items = classroomAssignments,
-                                                key = { it -> it.id }
+                                        if (classroomAssignments.isEmpty()) {
+                                            Box(
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentAlignment = Alignment.Center
                                             ) {
-                                                GroupCard(
-                                                    group = it
+                                                Text(
+                                                    text = "No groups",
+                                                    style = MaterialTheme.typography.titleMedium
                                                 )
+                                            }
+                                        } else {
+                                            LazyColumn(
+                                                modifier = Modifier.fillMaxSize(),
+                                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                                            ) {
+                                                items(
+                                                    items = classroomAssignments,
+                                                    key = { it -> it.id }
+                                                ) {
+                                                    GroupCard(
+                                                        group = it
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -383,20 +419,32 @@ fun CourseDetailScreen(
                                 when (classroomMaterials) {
                                     is ViewState.Success -> {
                                         val classroomMaterials = (classroomMaterials as ViewState.Success).data
-                                        LazyColumn(
-                                            modifier = Modifier.fillMaxSize(),
-                                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                                        ) {
-                                            items(
-                                                items = classroomMaterials,
-                                                key = { it -> it.id }
+                                        if (classroomMaterials.isEmpty()) {
+                                            Box(
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentAlignment = Alignment.Center
                                             ) {
-                                                MaterialCard(
-                                                    material = it,
-                                                    onDownloadClick = {
-                                                        viewModel.getFileDownloadLink(it)
-                                                    }
+                                                Text(
+                                                    text = "No materials",
+                                                    style = MaterialTheme.typography.titleMedium
                                                 )
+                                            }
+                                        } else {
+                                            LazyColumn(
+                                                modifier = Modifier.fillMaxSize(),
+                                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                                            ) {
+                                                items(
+                                                    items = classroomMaterials,
+                                                    key = { it -> it.id }
+                                                ) {
+                                                    MaterialCard(
+                                                        material = it,
+                                                        onDownloadClick = {
+                                                            viewModel.getFileDownloadLink(it)
+                                                        }
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -428,10 +476,6 @@ fun CourseDetailScreen(
                                                 style = MaterialTheme.typography.bodySmall
                                             )
                                             HorizontalDivider()
-//                                            Text(
-//                                                text = "Teacher",
-//                                                style = MaterialTheme.typography.titleMedium
-//                                            )
                                             LazyColumn(
                                                 verticalArrangement = Arrangement.spacedBy(10.dp),
                                                 modifier = Modifier.fillMaxSize()
@@ -446,7 +490,10 @@ fun CourseDetailScreen(
                                                     items = classroomStudents,
                                                     key = { it -> it.id }
                                                 ) {
-                                                    StudentCard(student = it.student)
+                                                    StudentCard(
+                                                        student = it.student,
+                                                        score = it.score
+                                                    )
                                                 }
                                             }
                                         }

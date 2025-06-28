@@ -3,6 +3,7 @@ package com.se122.interactivelearning.ui.components
 import android.graphics.ColorFilter
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -26,7 +28,8 @@ import com.se122.interactivelearning.R
 
 @Composable
 fun StudentCard(
-    student: StudentResponse
+    student: StudentResponse,
+    score: Int?,
 ) {
     Card(
         modifier = Modifier
@@ -34,15 +37,26 @@ fun StudentCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            AsyncImage(
-                model = student.user.avatarUrl?.takeIf { it.isNotEmpty() } ?: R.drawable.img_avatar,
-                contentDescription = "avatar",
-                modifier = Modifier.size(50.dp).padding(10.dp).clip(RoundedCornerShape(50.dp)),
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                AsyncImage(
+                    model = student.user.avatarUrl?.takeIf { it.isNotEmpty() } ?: R.drawable.img_avatar,
+                    contentDescription = "avatar",
+                    modifier = Modifier.size(50.dp).clip(RoundedCornerShape(50.dp)),
+                )
+                Text(
+                    text = student.user.firstName + " " + student.user.lastName,
+                )
+            }
             Text(
-                text = student.user.lastName + " " + student.user.firstName,
+                text = score?.toString() ?: "0",
+                fontWeight = FontWeight.SemiBold
             )
         }
     }

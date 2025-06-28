@@ -16,7 +16,7 @@ import javax.inject.Singleton
 class SessionSocketManager @Inject constructor(
     tokenManager: TokenManager
 ): BaseSocketManager(tokenManager) {
-    override val namespaceUrl: String = "ws://192.168.2.1:3001/api/session"
+    override val namespaceUrl: String = "ws://192.168.1.6:3001/api/session"
 
     fun joinSession(sessionId: String) {
         emit("joinSession", sessionId)
@@ -50,13 +50,15 @@ class SessionSocketManager @Inject constructor(
         }
     }
 
-    fun onSlideReceived(callback: (slideUrl: String) -> Unit) {
+    fun onSlideReceived(callback: (slideUrl: String, slidePageId: String) -> Unit) {
         off("receiveSlide")
         on("receiveSlide") { args ->
             val data = args.getOrNull(0) as? JSONObject
             val slideUrl = data?.optString("slideUrl")
-            slideUrl?.let { callback(it) }
+            val slidePageId = data?.optString("slidePageId")
+            slideUrl?.let { callback(it, slidePageId ?: "") }
             Log.d(TAG, "onSlideReceived: $slideUrl")
+            Log.d(TAG, "onSlideReceived: $slidePageId")
         }
     }
 
@@ -64,8 +66,10 @@ class SessionSocketManager @Inject constructor(
         off("receiveQuestion")
         on("receiveQuestion") { args ->
             val data = args.getOrNull(0) as? JSONObject
+            val sessionId = data?.optString("sessionId")
             val questionId = data?.optString("questionId")
             questionId?.let { callback(it) }
+            Log.d(TAG, "onQuestionReceived: $questionId")
         }
     }
 

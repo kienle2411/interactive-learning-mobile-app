@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.style.TextAlign
 import com.se122.interactivelearning.data.remote.dto.QuestionResponse
 
 @Composable
@@ -100,7 +101,8 @@ fun MultipleChoiceQuestion(questionData: QuestionResponse, onQuestionAnswered: (
                 text = if (isCorrect) "Correct!" else "❌ Incorrect.",
                 color = if (isCorrect) Color.Green else Color.Red,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
+                textAlign = TextAlign.Center
             )
         }
     }

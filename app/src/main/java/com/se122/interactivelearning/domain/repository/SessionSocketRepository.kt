@@ -8,6 +8,7 @@ interface SessionSocketRepository {
     fun joinSession(sessionId: String)
     fun leaveSession(sessionId: String)
     fun sendMessage(sessionId: String, message: String)
-    fun onSlideReceived(callback: (slideUrl: String) -> Unit)
+    fun onSlideReceived(callback: (slideUrl: String, slidePageId: String) -> Unit)
     fun onMessageReceived(callback: (chatMessage: ChatMessageSession) -> Unit)
+    fun onQuestionReceived(callback: (questionId: String) -> Unit)
 }

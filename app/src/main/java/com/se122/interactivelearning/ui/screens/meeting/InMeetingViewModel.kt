@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
-import com.google.gson.internal.GsonBuildConfig
 import com.se122.interactivelearning.BuildConfig
 import com.se122.interactivelearning.common.ViewState
 import com.se122.interactivelearning.data.remote.api.ApiResult
@@ -22,30 +21,21 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.livekit.android.ConnectOptions
 import io.livekit.android.LiveKit
 import io.livekit.android.RoomOptions
-import io.livekit.android.compose.local.RoomScope
-import io.livekit.android.events.EventListenable
 import io.livekit.android.events.RoomEvent
 import io.livekit.android.events.collect
 import io.livekit.android.room.Room
-import io.livekit.android.room.participant.LocalParticipant
 import io.livekit.android.room.participant.Participant
 import io.livekit.android.room.track.DataPublishReliability
 import io.livekit.android.room.track.LocalVideoTrackOptions
-import io.livekit.android.room.track.Track
 import io.livekit.android.room.track.VideoTrack
-import io.socket.client.IO
-import io.socket.client.IO.socket
-import io.socket.client.Socket
+import io.livekit.android.room.track.Track.Source
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import livekit.LivekitModels
-import javax.inject.Inject
-import io.livekit.android.room.track.Track.Source
 import kotlinx.coroutines.flow.update
-import org.json.JSONObject
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class InMeetingViewModel @Inject constructor(
@@ -53,17 +43,19 @@ class InMeetingViewModel @Inject constructor(
     private val getMeetingAccessTokenUseCase: GetMeetingAccessTokenUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     @ApplicationContext private val context: Context
-): ViewModel() {
+) : ViewModel() {
+
+    // State flows
     private val _meeting = MutableStateFlow<ViewState<MeetingResponse>>(ViewState.Idle)
     val meeting = _meeting.asStateFlow()
 
-    private var _chatMessages = MutableStateFlow<List<ChatMessage>>(emptyList())
+    private val _chatMessages = MutableStateFlow<List<ChatMessage>>(emptyList())
     val chatMessages = _chatMessages.asStateFlow()
 
     private val _uiToast = MutableSharedFlow<String>()
     val uiToast = _uiToast.asSharedFlow()
 
-    private var _room = MutableStateFlow<Room?>(null)
+    private val _room = MutableStateFlow<Room?>(null)
     val room = _room.asStateFlow()
 
     private val _remoteVideoTracks = MutableStateFlow<List<VideoTrack>>(emptyList())
@@ -78,37 +70,38 @@ class InMeetingViewModel @Inject constructor(
     private val _profile = MutableStateFlow<ProfileResponse?>(null)
     val profile = _profile.asStateFlow()
 
-    private val _participants = MutableStateFlow<List<Participant?>>(emptyList())
+    private val _participants = MutableStateFlow<List<Participant>>(emptyList())
     val participants = _participants.asStateFlow()
 
     init {
+        initialize()
+    }
+
+    // region Initialization
+    private fun initialize() {
         viewModelScope.launch {
             _uiToast.emit("Connecting...")
-            getParticipantList()
-            when (val result = getProfileUseCase.invoke()) {
-                is ApiResult.Success -> {
-                    _profile.value = result.data
-                }
-                else -> {}
-            }
+            loadProfile()
+            updateParticipantList()
         }
     }
 
+    private suspend fun loadProfile() {
+        when (val result = getProfileUseCase.invoke()) {
+            is ApiResult.Success -> _profile.update { result.data }
+            else -> Log.e("Meeting", "Failed to load profile")
+        }
+    }
+    // endregion
+
+    // region Meeting Management
     fun loadMeeting(id: String) {
         viewModelScope.launch {
             _meeting.value = ViewState.Loading
             when (val result = getMeetingInformationUseCase(id)) {
-                is ApiResult.Success -> {
-                    _meeting.value = ViewState.Success(result.data)
-                }
-                is ApiResult.Error -> {
-//                    val msg = (result.message + " " + result.errors?.first())
-//                    _meeting.value = ViewState.Error(msg)
-                }
-                is ApiResult.Exception -> {
-                    val msg = "Unknown error"
-                    _meeting.value = ViewState.Error(msg)
-                }
+                is ApiResult.Success -> _meeting.update { ViewState.Success(result.data) }
+                is ApiResult.Error -> _meeting.update { ViewState.Error("Error: ${result.message}") }
+                is ApiResult.Exception -> _meeting.update { ViewState.Error("Unknown error") }
             }
         }
     }
@@ -116,208 +109,203 @@ class InMeetingViewModel @Inject constructor(
     fun joinMeeting(meetingId: String) {
         viewModelScope.launch {
             when (val result = getMeetingAccessTokenUseCase(meetingId)) {
-                is ApiResult.Success -> {
-                    connectToLiveKitRoom(result.data.accessToken)
-                }
-                else -> {}
+                is ApiResult.Success -> connectToLiveKitRoom(result.data.accessToken)
+                else -> _uiToast.emit("Failed to join meeting")
             }
         }
     }
 
-    fun sendMessage(message: String) {
+    fun disconnect() {
         viewModelScope.launch {
-            val payload = ChatPayload(
-                senderId = _profile.value?.id.toString(),
-                senderName = _profile.value?.firstName + " " + _profile.value?.lastName,
-                message = message
-            )
-            val json = Gson().toJson(payload)
-            _room.value?.localParticipant?.publishData(
-                data = json.toByteArray(Charsets.UTF_8)
-            )
-            _chatMessages.value = _chatMessages.value + ChatMessage(
-                message = message,
-                participant = _room.value?.localParticipant,
-                timestamp = System.currentTimeMillis(),
-                senderName = _room.value?.localParticipant?.name ?: ""
-            )
-            Log.i("Meeting", _chatMessages.value.toString())
+            _room.value?.disconnect()
+            clearRoomState()
+            _uiToast.emit("Left meeting")
         }
     }
 
-
-    fun getParticipantList() {
-        viewModelScope.launch {
-            _participants.value = emptyList<Participant?>()
-            _participants.value = _participants.value + _room.value?.localParticipant
-            _room.value?.remoteParticipants?.values?.forEach {
-                _participants.value = _participants.value + it
-            }
-        }
+    private fun clearRoomState() {
+        _room.update { null }
+        _remoteVideoTracks.update { emptyList() }
+        _localVideoTrack.update { null }
+        _remoteScreenVideo.update { null }
+        _participants.update { emptyList() }
     }
 
-    private fun connectToLiveKitRoom(token: String) {
-        viewModelScope.launch {
-            val liveKitUrl = BuildConfig.LIVEKIT_URL
-            try {
-                Log.i("Meeting", "Connect")
-                val room = LiveKit.create(
-                    appContext = context,
-                    options = RoomOptions(
-                        adaptiveStream = true,
-                        dynacast = true,
-                    )
-                )
-
-                _room.value = room
-                room.connect(liveKitUrl, token, ConnectOptions(autoSubscribe = true))
-
-                val videoTrack = room.localParticipant.createVideoTrack(
-                    name = "Camera",
-                    options = LocalVideoTrackOptions()
-                )
-                videoTrack.let {
-                    room.localParticipant.publishVideoTrack(it)
-                }
-
-                _localVideoTrack.value = videoTrack
-
-                val audioTrack = room.localParticipant.createAudioTrack(
-                    name = "Microphone"
-                )
-
-                audioTrack.let {
-                    room.localParticipant.publishAudioTrack(it)
-                }
-
-                room.remoteParticipants.values.forEach { participant ->
-                    participant.trackPublications.values.forEach { publication ->
-                        if (publication.kind == Track.Kind.VIDEO) {
-                            publication.track?.let {
-                                _remoteVideoTracks.value = _remoteVideoTracks.value + (it as VideoTrack)
-                            }
-                        }
-                        if (publication.source == Source.SCREEN_SHARE) {
-                            Log.i("Meeting", "Screen share")
-                            _remoteScreenVideo.value = (publication.track as VideoTrack)
-                        }
-                    }
-                }
-
-                room.localParticipant.setCameraEnabled(true)
-                room.localParticipant.setMicrophoneEnabled(true)
-
-                observeRoomEvents()
-                getParticipantList()
-            } catch (e: Exception) {
-                Log.i("Meeting", "Exception$e")
-            }
-        }
+    override fun onCleared() {
+        super.onCleared()
+        disconnect()
     }
+    // endregion
 
-    private fun observeRoomEvents() {
-        viewModelScope.launch {
-           _room.value?.events?.collect { event ->
-               when (event) {
-                   is RoomEvent.ParticipantConnected -> {
-                       _uiToast.emit("New connect")
-                       getParticipantList()
-                   }
-                   is RoomEvent.ParticipantDisconnected -> {
-                       _uiToast.emit("Participant disconnected")
-                       getParticipantList()
-                   }
-                   is RoomEvent.Disconnected -> {
-                       _remoteVideoTracks.value = emptyList()
-                       _localVideoTrack.value = null
-                       _remoteScreenVideo.value = null
-                       _uiToast.emit("Disconnected")
-                   }
-                   is RoomEvent.Reconnecting -> {
-                       _uiToast.emit("Reconnecting...")
-                   }
-//                   is RoomEvent.TrackSubscribed -> {
-//                        if (event.track is VideoTrack) {
-//                            _remoteVideoTracks.value = _remoteVideoTracks.value + (event.track as VideoTrack)
-//                        }
-//                       Log.i("Meeting", "Subscribed")
-//                   }
-                   is RoomEvent.TrackSubscribed -> {
-                       if (event.track is VideoTrack) {
-                           if (event.publication.source == Source.SCREEN_SHARE) {
-                               _remoteScreenVideo.value = event.track as VideoTrack
-                           } else {
-                               _remoteVideoTracks.value = _remoteVideoTracks.value + (event.track as VideoTrack)
-                           }
-                       }
-                       Log.i("Meeting", "Subscribed")
-                   }
-                   is RoomEvent.DataReceived -> {
-                       val msgString = event.data.toString(Charsets.UTF_8)
-                       val parsedMessage = try {
-                           val json = JSONObject(msgString)
-                           json.optString("message", msgString)
-                       } catch (e: Exception) {
-                           msgString
-                       }
-                       _uiToast.emit(
-                           "${event.participant?.name}: $parsedMessage"
-                       )
-                       _chatMessages.update { oldList ->
-                           oldList + ChatMessage(
-                               message = parsedMessage,
-                               participant = event.participant,
-                               timestamp = System.currentTimeMillis(),
-                               senderName = event.participant?.name ?: ""
-                           )
-                       }
-                       val messageJson = event.data.toString(Charsets.UTF_8)
-                       try {
-                           val payload = Gson().fromJson(messageJson, ChatPayload::class.java)
-                           _chatMessages.value = _chatMessages.value + ChatMessage(
-                               participant = event.participant,
-                               timestamp = System.currentTimeMillis(),
-                               message = payload.message,
-                               senderName = payload.senderName
-                           )
-                       } catch (e: Exception) {
-
-                       }
-                   }
-                   else -> {
-
-                   }
-               }
-           }
-        }
-    }
-
+    // region Media Control
     fun toggleCamera(isEnabled: Boolean) {
         viewModelScope.launch {
             _room.value?.localParticipant?.setCameraEnabled(isEnabled)
+                ?: _uiToast.emit("Room not initialized")
         }
     }
 
     fun toggleMic(isEnabled: Boolean) {
         viewModelScope.launch {
             _room.value?.localParticipant?.setMicrophoneEnabled(isEnabled)
+                ?: _uiToast.emit("Room not initialized")
         }
     }
+    // endregion
 
-    override fun onCleared() {
-        super.onCleared()
-        _room.value?.disconnect()
-        _room.value = null
-    }
-
-    fun disconnect() {
+    // region Chat Management
+    fun sendMessage(message: String) {
         viewModelScope.launch {
-            _room.value?.disconnect()
-            _room.value = null
-            _remoteVideoTracks.value = emptyList()
-            _localVideoTrack.value = null
-            _remoteScreenVideo.value = null
-            _uiToast.emit("Leave meeting")
+            val room = _room.value ?: run {
+                _uiToast.emit("Room not initialized")
+                return@launch
+            }
+            val participant = room.localParticipant ?: run {
+                _uiToast.emit("Participant not initialized")
+                return@launch
+            }
+            val payload = ChatPayload(
+                senderId = _profile.value?.id.toString(),
+                senderName = "${_profile.value?.firstName} ${_profile.value?.lastName}",
+                message = message
+            )
+            try {
+                val json = Gson().toJson(payload)
+                participant.publishData(
+                    data = json.toByteArray(Charsets.UTF_8),
+                    reliability = DataPublishReliability.RELIABLE
+                )
+                _chatMessages.update { it + ChatMessage(
+                    message = message,
+                    participant = participant,
+                    timestamp = System.currentTimeMillis(),
+                    senderName = participant.name ?: ""
+                ) }
+                Log.i("Meeting", "Sent message: $message")
+            } catch (e: Exception) {
+                Log.e("Meeting", "Failed to send message", e)
+                _uiToast.emit("Failed to send message")
+            }
         }
     }
+    // endregion
+
+    // region Participant Management
+    private fun updateParticipantList() {
+        viewModelScope.launch {
+            val room = _room.value ?: return@launch
+            val participants = mutableListOf<Participant>()
+            room.localParticipant?.let { participants.add(it) }
+            room.remoteParticipants.values.forEach { participants.add(it) }
+            _participants.update { participants }
+        }
+    }
+    // endregion
+
+    // region LiveKit Room
+    private fun connectToLiveKitRoom(token: String) {
+        viewModelScope.launch {
+            try {
+                val room = LiveKit.create(
+                    appContext = context,
+                    options = RoomOptions(adaptiveStream = true, dynacast = true)
+                )
+                _room.update { room }
+                room.connect(BuildConfig.LIVEKIT_URL, token, ConnectOptions(autoSubscribe = true))
+
+                setupLocalTracks(room)
+                setupRemoteTracks(room)
+                room.localParticipant?.setCameraEnabled(true)
+                room.localParticipant?.setMicrophoneEnabled(true)
+
+                observeRoomEvents()
+                updateParticipantList()
+            } catch (e: Exception) {
+                Log.e("Meeting", "Connection failed", e)
+                _uiToast.emit("Failed to connect to room")
+            }
+        }
+    }
+
+    private suspend fun setupLocalTracks(room: Room) {
+        val videoTrack = room.localParticipant.createVideoTrack(
+            name = "Camera",
+            options = LocalVideoTrackOptions()
+        )
+        room.localParticipant.publishVideoTrack(videoTrack)
+        _localVideoTrack.update { videoTrack }
+
+        val audioTrack = room.localParticipant.createAudioTrack(name = "Microphone")
+        room.localParticipant.publishAudioTrack(audioTrack)
+    }
+
+    private fun setupRemoteTracks(room: Room) {
+        room.remoteParticipants.values.forEach { participant ->
+            participant.trackPublications.values.forEach { publication ->
+                if (publication.kind == io.livekit.android.room.track.Track.Kind.VIDEO) {
+                    publication.track?.let { track ->
+                        if (publication.source == Source.SCREEN_SHARE) {
+                            _remoteScreenVideo.update { track as VideoTrack }
+                        } else {
+                            _remoteVideoTracks.update { it + (track as VideoTrack) }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun observeRoomEvents() {
+        viewModelScope.launch {
+            _room.value?.events?.collect { event ->
+                when (event) {
+                    is RoomEvent.ParticipantConnected -> {
+                        _uiToast.emit("New participant connected")
+                        updateParticipantList()
+                    }
+                    is RoomEvent.ParticipantDisconnected -> {
+                        _uiToast.emit("Participant disconnected")
+                        updateParticipantList()
+                    }
+                    is RoomEvent.Disconnected -> {
+                        clearRoomState()
+                        _uiToast.emit("Disconnected")
+                    }
+                    is RoomEvent.Reconnecting -> _uiToast.emit("Reconnecting...")
+                    is RoomEvent.TrackSubscribed -> {
+                        if (event.track is VideoTrack) {
+                            if (event.publication.source == Source.SCREEN_SHARE) {
+                                _remoteScreenVideo.update { event.track as VideoTrack }
+                            } else {
+                                _remoteVideoTracks.update { it + (event.track as VideoTrack) }
+                            }
+                        }
+                        Log.i("Meeting", "Track subscribed")
+                    }
+                    is RoomEvent.DataReceived -> handleDataReceived(event)
+                    else -> {}
+                }
+            }
+        }
+    }
+
+    private suspend fun handleDataReceived(event: RoomEvent.DataReceived) {
+        val messageJson = event.data.toString(Charsets.UTF_8)
+        try {
+            val payload = Gson().fromJson(messageJson, ChatPayload::class.java)
+            if (payload.message.isNotEmpty()) {
+                _chatMessages.update { it + ChatMessage(
+                    message = payload.message,
+                    participant = event.participant,
+                    timestamp = System.currentTimeMillis(),
+                    senderName = payload.senderName
+                ) }
+                _uiToast.emit("${payload.senderName}: ${payload.message}")
+            }
+        } catch (e: Exception) {
+            Log.e("Meeting", "Failed to parse message: $messageJson", e)
+            _uiToast.emit("Failed to parse message")
+        }
+    }
+    // endregion
 }

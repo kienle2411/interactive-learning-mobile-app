@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.BottomAppBar
@@ -34,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.se122.interactivelearning.R
@@ -105,11 +107,12 @@ fun QuizJoinScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.quiz_img), // 🔁 Thay tên ảnh phù hợp
+                painter = painterResource(id = R.drawable.quiz_img),
                 contentDescription = "Quiz Banner",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp)
+                    .clip(RoundedCornerShape(12.dp))
             )
 
             Text(

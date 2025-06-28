@@ -1,6 +1,7 @@
 package com.se122.interactivelearning.di
 
 import com.se122.interactivelearning.core.data.network.TokenAuthenticator
+import com.se122.interactivelearning.data.remote.api.AnswerApi
 import com.se122.interactivelearning.data.remote.api.AuthApi
 import com.se122.interactivelearning.data.remote.api.ClassroomApi
 import com.se122.interactivelearning.data.remote.api.FileApi
@@ -26,7 +27,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     @Provides
-    fun provideBaseUrl() = "http://192.168.2.1:3001/api/"
+    fun provideBaseUrl() = "http://192.168.1.6:3001/api/"
 
     @Provides
     @Singleton
@@ -104,5 +105,11 @@ object NetworkModule {
     @Singleton
     fun provideQuestionApi(retrofit: Retrofit): QuestionApi {
         return retrofit.create(QuestionApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAnswerApi(retrofit: Retrofit): AnswerApi {
+        return retrofit.create(AnswerApi::class.java)
     }
 }
