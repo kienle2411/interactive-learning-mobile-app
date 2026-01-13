@@ -84,7 +84,7 @@ fun MyApplication() {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
             if (currentRoute in bottomBarRoutes) {
-                NavigationBar(navController = navController)
+                NavigationBar(navController = navController, currentRoute = currentRoute)
             }
         },
     ) { innerPadding ->

@@ -3,8 +3,6 @@ package com.se122.interactivelearning.ui.components
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,8 +15,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Label
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,24 +26,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.se122.interactivelearning.R
-import com.se122.interactivelearning.data.remote.dto.SessionResponse
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
+import com.se122.interactivelearning.ui.model.SessionUi
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SessionCard(
-    session: SessionResponse,
+    session: SessionUi,
     onJoinClick: (String) -> Unit
 ) {
-    val formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")
-    val start = ZonedDateTime.parse(session.startTime, DateTimeFormatter.ISO_DATE_TIME)
-    val end = ZonedDateTime.parse(session.endTime, DateTimeFormatter.ISO_DATE_TIME)
-    val now = ZonedDateTime.now()
-    val canJoin = now.isAfter(start) && now.isBefore(end)
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -89,12 +77,12 @@ fun SessionCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Start: ${formatter.format(start)}",
+                    text = "Start: ${session.startText}",
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.Gray
                 )
                 Text(
-                    text = "End: ${formatter.format(end)}",
+                    text = "End: ${session.endText}",
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.Gray
                 )
@@ -103,7 +91,7 @@ fun SessionCard(
             Spacer(modifier = Modifier.width(12.dp))
 
             // Right - Join
-            if (canJoin) {
+            if (session.canJoin) {
                 Button(
                     onClick = { onJoinClick(session.id) },
                     shape = RoundedCornerShape(8.dp)

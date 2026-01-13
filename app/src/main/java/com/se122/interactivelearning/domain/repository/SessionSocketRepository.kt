@@ -1,6 +1,7 @@
 package com.se122.interactivelearning.domain.repository
 
 import com.se122.interactivelearning.domain.model.ChatMessageSession
+import com.se122.interactivelearning.domain.model.SessionParticipant
 
 interface SessionSocketRepository {
     fun connect(onConnected: () -> Unit)
@@ -11,4 +12,9 @@ interface SessionSocketRepository {
     fun onSlideReceived(callback: (slideUrl: String, slidePageId: String) -> Unit)
     fun onMessageReceived(callback: (chatMessage: ChatMessageSession) -> Unit)
     fun onQuestionReceived(callback: (questionId: String) -> Unit)
+    fun onSessionInfoReceived(callback: (participants: List<SessionParticipant>) -> Unit)
+    fun onUserJoined(
+        callback: (participant: SessionParticipant, currentClients: List<SessionParticipant>?) -> Unit
+    )
+    fun onUserLeft(callback: (participantId: String) -> Unit)
 }

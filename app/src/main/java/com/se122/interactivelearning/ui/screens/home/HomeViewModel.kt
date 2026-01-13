@@ -10,10 +10,15 @@ import com.se122.interactivelearning.data.remote.api.ApiResult
 import com.se122.interactivelearning.data.remote.dto.MeetingResponse
 import com.se122.interactivelearning.data.remote.dto.ProfileResponse
 import com.se122.interactivelearning.data.remote.dto.SessionResponse
+import com.se122.interactivelearning.data.remote.dto.SuggestionsResponse
+import com.se122.interactivelearning.data.remote.dto.ClassroomWrapperResponse
 import com.se122.interactivelearning.domain.usecase.profile.GetProfileUseCase
 import com.se122.interactivelearning.domain.usecase.auth.LoginUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetAllMeetingsUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetAllSessionsUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomAISuggestionsUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomListUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.GetOverallAISuggestionsUseCase
 import com.se122.interactivelearning.utils.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -24,11 +29,17 @@ class HomeViewModel @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val tokenManager: TokenManager,
     private val getAllMeetingsUseCase: GetAllMeetingsUseCase,
-    private val getAllSessionsUseCase: GetAllSessionsUseCase
+    private val getAllSessionsUseCase: GetAllSessionsUseCase,
+    private val getClassroomListUseCase: GetClassroomListUseCase,
+    private val getClassroomAISuggestionsUseCase: GetClassroomAISuggestionsUseCase,
+    private val getOverallAISuggestionsUseCase: GetOverallAISuggestionsUseCase,
 ): ViewModel() {
     val userState = mutableStateOf<ProfileResponse?>(null)
     val meetingsState = mutableStateOf<List<MeetingResponse>>(emptyList())
     val sessionsState = mutableStateOf<List<SessionResponse>>(emptyList())
+    val classroomsState = mutableStateOf<List<ClassroomWrapperResponse>>(emptyList())
+    val overallSuggestionsState = mutableStateOf<SuggestionsResponse?>(null)
+    val classroomSuggestionsState = mutableStateOf<Map<String, SuggestionsResponse>>(emptyMap())
 
     fun loadUserProfile() {
         viewModelScope.launch {
@@ -42,6 +53,7 @@ class HomeViewModel @Inject constructor(
                     Log.i("HomeViewModel", "Success: ${result.data}")
                     loadAllMeetings()
                     loadAllSessions()
+                    loadClassroomsAndSuggestions()
                 }
                 is ApiResult.Error -> {
                     Log.i("HomeViewModel", "Error: $result")
@@ -82,6 +94,37 @@ class HomeViewModel @Inject constructor(
             sessions.forEachIndexed { index, session ->
                 Log.i("HomeViewModel", "Session $index: $session")
             }
+        }
+    }
+
+    fun loadClassroomsAndSuggestions() {
+        viewModelScope.launch {
+            val result = getClassroomListUseCase()
+            if (result !is ApiResult.Success) {
+                classroomsState.value = emptyList()
+                overallSuggestionsState.value = null
+                classroomSuggestionsState.value = emptyMap()
+                return@launch
+            }
+
+            val classrooms = result.data.data
+            classroomsState.value = classrooms
+
+            val overallResult = getOverallAISuggestionsUseCase()
+            overallSuggestionsState.value =
+                (overallResult as? ApiResult.Success)?.data
+
+            val suggestionsMap = mutableMapOf<String, SuggestionsResponse>()
+            for (classroom in classrooms) {
+                val classroomId = classroom.classroom.id
+                val suggestionResult = getClassroomAISuggestionsUseCase(classroomId)
+                val data = (suggestionResult as? ApiResult.Success)?.data
+                if (data != null) {
+                    suggestionsMap[classroomId] = data
+                }
+            }
+
+            classroomSuggestionsState.value = suggestionsMap
         }
     }
 }

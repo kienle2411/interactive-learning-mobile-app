@@ -17,11 +17,13 @@ object NavRoutes {
     const val SETTINGS = "settings"
 
     const val IN_SESSION = "in_session/{id}"
+    const val LESSON_DETAIL = "lesson_detail/{id}"
 
     const val QUIZ_JOIN = "quiz_join/{id}"
     const val IN_QUIZ = "in_quiz/{id}"
     const val QUIZZES = "quizzes"
     const val QUIZ_SUMMARY = "quiz_summary"
+    const val ASSIGNMENT_DETAIL = "assignment_detail/{id}"
 
     const val RECOVERY_PASSWORD = "recovery_password"
 }

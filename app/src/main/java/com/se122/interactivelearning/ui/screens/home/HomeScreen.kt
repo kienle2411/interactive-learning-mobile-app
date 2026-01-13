@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -47,6 +48,7 @@ import com.eygraber.compose.placeholder.material3.placeholder
 import com.eygraber.compose.placeholder.material3.shimmer
 import com.se122.interactivelearning.R
 import com.se122.interactivelearning.data.remote.dto.MeetingResponse
+import com.se122.interactivelearning.data.remote.dto.SuggestedActionResponse
 import com.se122.interactivelearning.ui.components.HexagonIconButton
 import com.se122.interactivelearning.ui.components.HomeMeetingCard
 import com.se122.interactivelearning.ui.components.HomeSessionCard
@@ -65,6 +67,9 @@ fun HomeScreen(
     val user = viewModel.userState.value
     val meetings = viewModel.meetingsState.value
     val sessions = viewModel.sessionsState.value
+    val classrooms = viewModel.classroomsState.value
+    val overallSuggestions = viewModel.overallSuggestionsState.value
+    val classroomSuggestions = viewModel.classroomSuggestionsState.value
 
     LaunchedEffect(Unit) {
         viewModel.loadUserProfile()
@@ -152,6 +157,40 @@ fun HomeScreen(
 
             }
 
+            if (!overallSuggestions?.suggestions.isNullOrEmpty()) {
+                Text(
+                    text = "Overall AI Suggestions",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                overallSuggestions?.overallMastery?.let { mastery ->
+                    val masteryPercent = (mastery * 100).toInt()
+                    Text(
+                        text = "Overall mastery: ${masteryPercent}%",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                SuggestionsList(
+                    suggestions = overallSuggestions?.suggestions ?: emptyList()
+                )
+            }
+
+            val classroomsWithSuggestions = classrooms.mapNotNull { classroomWrapper ->
+                val classroomId = classroomWrapper.classroom.id
+                val suggestions = classroomSuggestions[classroomId]?.suggestions.orEmpty()
+                if (suggestions.isEmpty()) {
+                    null
+                } else {
+                    classroomWrapper to suggestions
+                }
+            }
+
+            classroomsWithSuggestions.forEach { (classroomWrapper, suggestions) ->
+                Text(
+                    text = "Suggestions for ${classroomWrapper.classroom.name}",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                SuggestionsList(suggestions = suggestions)
+            }
 
             Text(
                 text = "Upcoming Meetings",
@@ -201,6 +240,44 @@ fun HomeScreen(
                 }
             }
             Spacer(modifier = Modifier.height(48.dp))
+        }
+    }
+}
+
+@Composable
+private fun SuggestionsList(
+    suggestions: List<SuggestedActionResponse>
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        suggestions.forEach { suggestion ->
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = suggestion.title,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    suggestion.subtitle?.let { subtitle ->
+                        Text(
+                            text = subtitle,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Gray
+                        )
+                    }
+                    Text(
+                        text = suggestion.reason,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
         }
     }
 }

@@ -1,59 +1,40 @@
 package com.se122.interactivelearning.ui.components
 
-import android.util.Log
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.AnimationVector
-import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.TwoWayConverter
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.animateValueAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.se122.interactivelearning.R
 
 @Composable
 fun NavigationBar(
-    navController: NavHostController
+    navController: NavHostController,
+    currentRoute: String?
 ) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
     Row(
         modifier = Modifier
             .shadow(elevation = 30.dp)
@@ -64,35 +45,47 @@ fun NavigationBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         NavBarList.forEach { item ->
-            val iconSize by animateFloatAsState(
-                targetValue = if (currentRoute == item.route) 28f else 22f,
-                animationSpec = if (currentRoute == item.route) tween(durationMillis = 300) else tween(durationMillis = 0)
-            )
-            val fontSize by animateFloatAsState(
-                targetValue = if (currentRoute == item.route) 12f else 10f,
-                animationSpec = if (currentRoute == item.route) tween(durationMillis = 300) else tween(durationMillis = 0)
-            )
+            val isSelected = currentRoute == item.route
+            val iconSize = if (isSelected) {
+                val size by animateFloatAsState(
+                    targetValue = 28f,
+                    animationSpec = tween(durationMillis = 180)
+                )
+                size
+            } else {
+                22f
+            }
+            val fontSize = if (isSelected) {
+                val size by animateFloatAsState(
+                    targetValue = 12f,
+                    animationSpec = tween(durationMillis = 180)
+                )
+                size
+            } else {
+                10f
+            }
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(50.dp))
+                    .clip(RoundedCornerShape(25.dp))
+                    .weight(1f)
+                    .fillMaxWidth()
                     .clickable(
+                        enabled = !isSelected,
                         onClick = {
-                            if (currentRoute != item.route) {
-                                navController.navigate(item.route) {
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
+                            navController.navigate(item.route) {
+                                launchSingleTop = true
+                                restoreState = true
                             }
                         }
                     )
             ) {
                 Column(
-                    modifier = Modifier.padding(10.dp),
+                    modifier = Modifier.padding(10.dp).fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(3.dp)
                 ) {
                     Icon(
-                        painter = painterResource(id = if (currentRoute == item.route) item.iconFilled else item.icon),
+                        painter = painterResource(id = if (isSelected) item.iconFilled else item.icon),
                         contentDescription = item.title,
                         modifier = Modifier.size(iconSize.dp)
                     )
@@ -100,7 +93,7 @@ fun NavigationBar(
                         text = item.title,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = fontSize.sp,
-                        fontWeight =  if (currentRoute == item.route) FontWeight.SemiBold else FontWeight.Normal
+                        fontWeight =  if (isSelected) FontWeight.SemiBold else FontWeight.Normal
                     )
                 }
             }

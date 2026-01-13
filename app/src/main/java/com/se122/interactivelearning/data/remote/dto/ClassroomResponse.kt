@@ -8,11 +8,11 @@ data class ClassroomResponse(
     val id: String,
     val name: String,
     val code: String,
-    val description: String,
+    val description: String?,
     val capacity: Int,
     val createdAt: String,
-    val updatedAt: String,
-    val deletedAt: String,
+    val updatedAt: String?,
+    val deletedAt: String?,
     val teacher: TeacherClassroomResponse,
 )
 
@@ -29,9 +29,9 @@ data class ClassroomDetailsResponse(
     val id: String,
     val name: String,
     val code: String,
-    val description: String,
+    val description: String?,
     val capacity: Int,
     val createdAt: String,
-    val updatedAt: String,
-    val deletedAt: String,
+    val updatedAt: String?,
+    val deletedAt: String?,
 )

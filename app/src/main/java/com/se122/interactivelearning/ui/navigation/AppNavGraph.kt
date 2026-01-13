@@ -27,9 +27,11 @@ import androidx.navigation.navigation
 import com.se122.interactivelearning.ui.screens.auth.login.LoginScreen
 import com.se122.interactivelearning.ui.screens.auth.recovery_password.RecoveryPasswordScreen
 import com.se122.interactivelearning.ui.screens.auth.register.RegisterScreen
+import com.se122.interactivelearning.ui.screens.assignment.AssignmentDetailScreen
 import com.se122.interactivelearning.ui.screens.course.CourseDetailScreen
 import com.se122.interactivelearning.ui.screens.course.CourseScreen
 import com.se122.interactivelearning.ui.screens.home.HomeScreen
+import com.se122.interactivelearning.ui.screens.lesson.LessonDetailScreen
 import com.se122.interactivelearning.ui.screens.meeting.InMeetingScreen
 import com.se122.interactivelearning.ui.screens.meeting.MeetingJoinScreen
 import com.se122.interactivelearning.ui.screens.meeting.MeetingSharedViewModel
@@ -156,11 +158,28 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
                 onBackClick = {
                     navController.popBackStack()
                 },
-                onJoinMeetingClick = { meetingId ->
-                    navController.navigate("meeting_join/${meetingId}")
-                },
                 onJoinSessionClick = { sessionId ->
                     navController.navigate("in_session/${sessionId}")
+                },
+                onLessonClick = { lessonId ->
+                    navController.navigate("lesson_detail/${lessonId}")
+                },
+                onAssignmentClick = { assignmentId ->
+                    navController.navigate("assignment_detail/${assignmentId}")
+                }
+            )
+        }
+        composable(
+            route = NavRoutes.LESSON_DETAIL
+        ) { backStackEntry ->
+            val lessonId = backStackEntry.arguments?.getString("id")
+            LessonDetailScreen(
+                id = lessonId.toString(),
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onQuizClick = { quizId ->
+                    navController.navigate("quiz_join/${quizId}")
                 }
             )
         }
@@ -208,6 +227,17 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
             InSessionScreen(
                 sessionId = sessionId.toString(),
                 onLeaveClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(
+            route = NavRoutes.ASSIGNMENT_DETAIL
+        ) { backStackEntry ->
+            val assignmentId = backStackEntry.arguments?.getString("id")
+            AssignmentDetailScreen(
+                assignmentId = assignmentId.toString(),
+                onBackClick = {
                     navController.popBackStack()
                 }
             )

@@ -133,9 +133,13 @@ fun InMeetingScreen(
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             topBar = {
-                MeetingTopBar(meetingDetails, onParticipantsClick = {
+                MeetingTopBar(
+                    meetingDetails = meetingDetails,
+                    participantsCount = participants.size,
+                    onParticipantsClick = {
                     coroutineScope.launch { drawerState.open() }
-                })
+                    }
+                )
             },
             bottomBar = {
                 MeetingBottomBar(
@@ -195,16 +199,37 @@ private fun DrawerContent(participants: List<Participant>) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(
-            text = "Participants",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.Bold
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Participants",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = participants.size.toString(),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(10.dp)
         ) {
+            if (participants.isEmpty()) {
+                item {
+                    Text(
+                        text = "No participants yet",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
             items(participants) { participant ->
                 participant?.let {
                     Card(
@@ -255,6 +280,7 @@ private fun DrawerContent(participants: List<Participant>) {
 @Composable
 private fun MeetingTopBar(
     meetingDetails: ViewState<MeetingResponse>,
+    participantsCount: Int,
     onParticipantsClick: () -> Unit
 ) {
     CenterAlignedTopAppBar(
@@ -280,12 +306,23 @@ private fun MeetingTopBar(
             )
         },
         actions = {
-            IconButton(onClick = onParticipantsClick) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = "Participants",
-                    tint = MaterialTheme.colorScheme.onSurface
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = participantsCount.toString(),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.SemiBold
                 )
+                IconButton(onClick = onParticipantsClick) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Participants",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         },
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)

@@ -1,6 +1,10 @@
 package com.se122.interactivelearning.di
 
 import com.se122.interactivelearning.data.repository.AnswerRepositoryImpl
+import com.se122.interactivelearning.data.repository.AssignmentRepositoryImpl
+import com.se122.interactivelearning.data.repository.ChatRepositoryImpl
+import com.se122.interactivelearning.domain.repository.AssignmentRepository
+import com.se122.interactivelearning.domain.repository.ChatRepository
 import com.se122.interactivelearning.domain.repository.ClassroomRepository
 import com.se122.interactivelearning.data.repository.ClassroomRepositoryImpl
 import com.se122.interactivelearning.domain.repository.FileRepository
@@ -104,4 +108,16 @@ abstract class RepositoryModule {
     abstract fun bindAnswerRepository(
         answerRepositoryImpl: AnswerRepositoryImpl
     ): AnswerRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAssignmentRepository(
+        assignmentRepositoryImpl: AssignmentRepositoryImpl
+    ): AssignmentRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindChatRepository(
+        chatRepositoryImpl: ChatRepositoryImpl
+    ): ChatRepository
 }

@@ -8,9 +8,14 @@ import com.se122.interactivelearning.data.remote.dto.ClassroomResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomStudentResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomWrapperResponse
 import com.se122.interactivelearning.data.remote.dto.Group
+import com.se122.interactivelearning.data.remote.dto.LessonDetailResponse
+import com.se122.interactivelearning.data.remote.dto.LessonResponse
 import com.se122.interactivelearning.data.remote.dto.MaterialResponse
 import com.se122.interactivelearning.data.remote.dto.MeetingResponse
+import com.se122.interactivelearning.data.remote.dto.QuizResponse
 import com.se122.interactivelearning.data.remote.dto.SessionResponse
+import com.se122.interactivelearning.data.remote.dto.SuggestionsResponse
+import com.se122.interactivelearning.data.remote.dto.TopicResponse
 
 interface ClassroomRepository {
     suspend fun getClassroom(): ApiResult<PaginationResponse<ClassroomWrapperResponse>>
@@ -20,6 +25,12 @@ interface ClassroomRepository {
     suspend fun getClassroomSessions(id: String): ApiResult<PaginationResponse<SessionResponse>>
     suspend fun getClassroomMeetings(id: String): ApiResult<PaginationResponse<MeetingResponse>>
     suspend fun getClassroomAssignments(id: String): ApiResult<PaginationResponse<AssignmentResponse>>
+    suspend fun getClassroomTopics(id: String): ApiResult<PaginationResponse<TopicResponse>>
+    suspend fun getClassroomAISuggestions(id: String): ApiResult<SuggestionsResponse>
+    suspend fun getOverallAISuggestions(): ApiResult<SuggestionsResponse>
+    suspend fun getTopicLessons(id: String): ApiResult<PaginationResponse<LessonResponse>>
+    suspend fun getLessonDetail(id: String): ApiResult<LessonDetailResponse>
+    suspend fun getLessonQuizzes(id: String): ApiResult<List<QuizResponse>>
     suspend fun getClassroomGroups(id: String): ApiResult<PaginationResponse<Group>>
     suspend fun joinClassroom(code: String): ApiResult<ClassroomStudentResponse>
 }

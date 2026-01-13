@@ -11,6 +11,7 @@ import com.se122.interactivelearning.data.remote.dto.QuestionResponse
 import com.se122.interactivelearning.data.remote.dto.SessionResponse
 import com.se122.interactivelearning.domain.model.ChatMessage
 import com.se122.interactivelearning.domain.model.ChatMessageSession
+import com.se122.interactivelearning.domain.model.SessionParticipant
 import com.se122.interactivelearning.domain.repository.SessionSocketRepository
 import com.se122.interactivelearning.domain.usecase.answer.CreateAnswerUseCase
 import com.se122.interactivelearning.domain.usecase.question.GetQuestionUseCase
@@ -41,6 +42,9 @@ class InSessionViewModel @Inject constructor(
     private val _messages = MutableStateFlow<List<ChatMessageSession>>(emptyList())
     val messages = _messages.asStateFlow()
 
+    private val _participants = MutableStateFlow<List<SessionParticipant>>(emptyList())
+    val participants = _participants.asStateFlow()
+
     private val _question = MutableStateFlow<ViewState<QuestionResponse>>(ViewState.Idle)
     val question = _question.asStateFlow()
 
@@ -64,6 +68,17 @@ class InSessionViewModel @Inject constructor(
             observeQuestion()
             observeSlide()
             observeMessages()
+            observeParticipants()
+        }
+    }
+
+    fun connectAndJoin(sessionId: String) {
+        sessionSocketRepository.connect {
+            joinSession(sessionId)
+            observeQuestion()
+            observeSlide()
+            observeMessages()
+            observeParticipants()
         }
     }
 
@@ -74,6 +89,7 @@ class InSessionViewModel @Inject constructor(
     fun leaveSession(sessionId: String) {
         sessionSocketRepository.leaveSession(sessionId)
         disconnectSocket()
+        _participants.value = emptyList()
     }
 
     fun joinSession(sessionId: String) {
@@ -93,6 +109,22 @@ class InSessionViewModel @Inject constructor(
     fun observeMessages() {
         sessionSocketRepository.onMessageReceived {
             _messages.value = _messages.value + it
+        }
+    }
+
+    fun observeParticipants() {
+        sessionSocketRepository.onSessionInfoReceived { participants ->
+            _participants.value = participants.distinctBy { it.id }
+        }
+        sessionSocketRepository.onUserJoined { participant, currentClients ->
+            _participants.value = if (!currentClients.isNullOrEmpty()) {
+                currentClients.distinctBy { it.id }
+            } else {
+                (_participants.value + participant).distinctBy { it.id }
+            }
+        }
+        sessionSocketRepository.onUserLeft { id ->
+            _participants.value = _participants.value.filterNot { it.id == id }
         }
     }
 

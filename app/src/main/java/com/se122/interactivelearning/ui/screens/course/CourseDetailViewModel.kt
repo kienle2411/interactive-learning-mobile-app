@@ -9,22 +9,29 @@ import com.se122.interactivelearning.data.remote.api.ApiResult
 import com.se122.interactivelearning.data.remote.dto.AssignmentResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomDetailsResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomStudentResponse
-import com.se122.interactivelearning.data.remote.dto.Group
+import com.se122.interactivelearning.data.remote.dto.LessonResponse
 import com.se122.interactivelearning.data.remote.dto.MaterialResponse
-import com.se122.interactivelearning.data.remote.dto.MeetingResponse
 import com.se122.interactivelearning.data.remote.dto.SessionResponse
+import com.se122.interactivelearning.data.remote.dto.TopicResponse
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomAssignmentsUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomDetailUseCase
-import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomGroupsUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomMaterialsUseCase
-import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomMeetingUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomSessionsUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomStudentsUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomTopicsUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.GetTopicLessonsUseCase
 import com.se122.interactivelearning.domain.usecase.file.GetFileDownloadLinkUseCase
+import com.se122.interactivelearning.ui.model.AssignmentUi
+import com.se122.interactivelearning.ui.model.AssignmentStatus
+import com.se122.interactivelearning.ui.model.SessionUi
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,9 +41,9 @@ class CourseDetailViewModel @Inject constructor(
     private val getClassroomMaterialsUseCase: GetClassroomMaterialsUseCase,
     private val getFileDownloadLinkUseCase: GetFileDownloadLinkUseCase,
     private val getClassroomSessionsUseCase: GetClassroomSessionsUseCase,
-    private val getClassroomMeetingUseCase: GetClassroomMeetingUseCase,
     private val getClassroomAssignmentsUseCase: GetClassroomAssignmentsUseCase,
-    private val getClassroomGroupsUseCase: GetClassroomGroupsUseCase,
+    private val getClassroomTopicsUseCase: GetClassroomTopicsUseCase,
+    private val getTopicLessonsUseCase: GetTopicLessonsUseCase,
 ): ViewModel() {
     private val _classroomDetails = MutableStateFlow<ViewState<ClassroomDetailsResponse>>(ViewState.Idle)
     val classroomDetails = _classroomDetails.asStateFlow()
@@ -50,17 +57,17 @@ class CourseDetailViewModel @Inject constructor(
     private val _fileDownloadLink = MutableStateFlow<ViewState<String>>(ViewState.Idle)
     val fileDownloadLink = _fileDownloadLink.asStateFlow()
 
-    private val _classroomSessions = MutableStateFlow<ViewState<List<SessionResponse>>>(ViewState.Idle)
+    private val _classroomSessions = MutableStateFlow<ViewState<List<SessionUi>>>(ViewState.Idle)
     val classroomSessions = _classroomSessions.asStateFlow()
 
-    private val _classroomMeetings = MutableStateFlow<ViewState<List<MeetingResponse>>>(ViewState.Idle)
-    val classroomMeetings = _classroomMeetings.asStateFlow()
-
-    private val _classroomAssignments = MutableStateFlow<ViewState<List<AssignmentResponse>>>(ViewState.Idle)
+    private val _classroomAssignments = MutableStateFlow<ViewState<List<AssignmentUi>>>(ViewState.Idle)
     val classroomAssignments = _classroomAssignments.asStateFlow()
 
-    private val _groupsState = MutableStateFlow<ViewState<List<Group>>>(ViewState.Idle)
-    val groupsState = _groupsState.asStateFlow()
+    private val _classroomTopics = MutableStateFlow<ViewState<List<TopicResponse>>>(ViewState.Idle)
+    val classroomTopics = _classroomTopics.asStateFlow()
+
+    private val _topicLessons = MutableStateFlow<Map<String, ViewState<List<LessonResponse>>>>(emptyMap())
+    val topicLessons = _topicLessons.asStateFlow()
 
     init {
 
@@ -131,7 +138,10 @@ class CourseDetailViewModel @Inject constructor(
             _classroomSessions.value = ViewState.Loading
             when (val result = getClassroomSessionsUseCase(id)) {
                 is ApiResult.Success -> {
-                    _classroomSessions.value = ViewState.Success(result.data.data)
+                    val items = withContext(Dispatchers.Default) {
+                        mapSessions(result.data.data)
+                    }
+                    _classroomSessions.value = ViewState.Success(items)
                 }
                 is ApiResult.Error -> {
                     Log.i("LoginViewModel", "Error: $result")
@@ -141,26 +151,6 @@ class CourseDetailViewModel @Inject constructor(
                 is ApiResult.Exception -> {
                     val msg = "Unknown error"
                     _classroomSessions.value = Error(msg)
-                }
-            }
-        }
-    }
-
-    fun loadMeetings(id: String) {
-        viewModelScope.launch {
-            _classroomMeetings.value = ViewState.Loading
-            when (val result = getClassroomMeetingUseCase(id)) {
-                is ApiResult.Success -> {
-                    _classroomMeetings.value = ViewState.Success(result.data.data)
-                }
-                is ApiResult.Error -> {
-                    Log.i("LoginViewModel", "Error: $result")
-                    val msg = (result.message + " " + result.errors?.first())
-                    _classroomMeetings.value = Error(msg)
-                }
-                is ApiResult.Exception -> {
-                    val msg = "Unknown error"
-                    _classroomMeetings.value = Error(msg)
                 }
             }
         }
@@ -171,7 +161,10 @@ class CourseDetailViewModel @Inject constructor(
             _classroomAssignments.value = ViewState.Loading
             when (val result = getClassroomAssignmentsUseCase(id)) {
                 is ApiResult.Success -> {
-                    _classroomAssignments.value = ViewState.Success(result.data.data)
+                    val items = withContext(Dispatchers.Default) {
+                        mapAssignments(result.data.data)
+                    }
+                    _classroomAssignments.value = ViewState.Success(items)
                 }
                 is ApiResult.Error -> {
                     Log.i("LoginViewModel", "Error: $result")
@@ -181,27 +174,6 @@ class CourseDetailViewModel @Inject constructor(
                 is ApiResult.Exception -> {
                     val msg = "Unknown error"
                     _classroomAssignments.value = Error(msg)
-                }
-            }
-        }
-    }
-
-    fun loadGroups(id: String) {
-        viewModelScope.launch {
-            _groupsState.value = ViewState.Loading
-            when (val result = getClassroomGroupsUseCase(id)) {
-                is ApiResult.Success -> {
-                    val filteredGroups = result.data.data.filter { it.deletedAt == null }
-                    _groupsState.value = ViewState.Success(filteredGroups)
-                }
-                is ApiResult.Error -> {
-                    Log.i("CourseDetailViewModel", "Group Error: $result")
-                    val msg = (result.message + " " + result.errors?.first())
-                    _groupsState.value = ViewState.Error(msg)
-                }
-                is ApiResult.Exception -> {
-                    val msg = "Unknown error"
-                    _groupsState.value = ViewState.Error(msg)
                 }
             }
         }
@@ -229,6 +201,98 @@ class CourseDetailViewModel @Inject constructor(
                     _fileDownloadLink.value = Error(msg)
                 }
             }
+        }
+    }
+
+    fun loadTopics(id: String) {
+        viewModelScope.launch {
+            _classroomTopics.value = ViewState.Loading
+            when (val result = getClassroomTopicsUseCase(id)) {
+                is ApiResult.Success -> {
+                    val filtered = result.data.data.filter { it.deletedAt == null }
+                    _classroomTopics.value = ViewState.Success(filtered)
+                }
+                is ApiResult.Error -> {
+                    Log.i("CourseDetailViewModel", "Topics Error: $result")
+                    val msg = (result.message + " " + result.errors?.first())
+                    _classroomTopics.value = Error(msg)
+                }
+                is ApiResult.Exception -> {
+                    val msg = "Unknown error"
+                    _classroomTopics.value = Error(msg)
+                }
+            }
+        }
+    }
+
+    fun loadLessonsForTopic(topicId: String) {
+        viewModelScope.launch {
+            _topicLessons.value = _topicLessons.value + (topicId to ViewState.Loading)
+            when (val result = getTopicLessonsUseCase(topicId)) {
+                is ApiResult.Success -> {
+                    val filtered = result.data.data.filter { it.deletedAt == null }
+                    _topicLessons.value = _topicLessons.value + (topicId to ViewState.Success(filtered))
+                }
+                is ApiResult.Error -> {
+                    Log.i("CourseDetailViewModel", "Lessons Error: $result")
+                    val msg = (result.message + " " + result.errors?.first())
+                    _topicLessons.value = _topicLessons.value + (topicId to ViewState.Error(msg))
+                }
+                is ApiResult.Exception -> {
+                    val msg = "Unknown error"
+                    _topicLessons.value = _topicLessons.value + (topicId to ViewState.Error(msg))
+                }
+            }
+        }
+    }
+
+    private fun mapSessions(items: List<SessionResponse>): List<SessionUi> {
+        val formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")
+        val now = ZonedDateTime.now()
+        return items.map { session ->
+            val start = ZonedDateTime.parse(session.startTime, DateTimeFormatter.ISO_DATE_TIME)
+            val end = ZonedDateTime.parse(session.endTime, DateTimeFormatter.ISO_DATE_TIME)
+            SessionUi(
+                id = session.id,
+                title = session.title,
+                description = session.description,
+                startText = formatter.format(start),
+                endText = formatter.format(end),
+                canJoin = now.isAfter(start) && now.isBefore(end),
+            )
+        }
+    }
+
+    private fun mapAssignments(items: List<AssignmentResponse>): List<AssignmentUi> {
+        val now = ZonedDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")
+        return items.map { assignment ->
+            val start = ZonedDateTime.parse(assignment.startTime, DateTimeFormatter.ISO_DATE_TIME)
+            val due = ZonedDateTime.parse(assignment.dueTime, DateTimeFormatter.ISO_DATE_TIME)
+            val isOngoing = now.isAfter(start) && now.isBefore(due)
+            val status = if (isOngoing) {
+                AssignmentStatus.ONGOING
+            } else if (due.isBefore(now)) {
+                AssignmentStatus.ENDED
+            } else {
+                AssignmentStatus.UPCOMING
+            }
+            val statusText = when (status) {
+                AssignmentStatus.ONGOING -> "Ongoing"
+                AssignmentStatus.ENDED -> "Ended"
+                AssignmentStatus.UPCOMING -> "Upcoming"
+            }
+            AssignmentUi(
+                id = assignment.id,
+                title = assignment.title,
+                description = assignment.description,
+                statusText = statusText,
+                status = status,
+                isOngoing = isOngoing,
+                startText = formatter.format(start),
+                dueText = formatter.format(due),
+                type = assignment.type,
+            )
         }
     }
 }

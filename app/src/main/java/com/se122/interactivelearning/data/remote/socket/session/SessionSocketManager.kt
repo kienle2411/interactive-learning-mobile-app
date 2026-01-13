@@ -4,9 +4,11 @@ import android.util.Log
 import com.se122.interactivelearning.data.remote.socket.base.BaseSocketManager
 import com.se122.interactivelearning.domain.model.ChatMessage
 import com.se122.interactivelearning.domain.model.ChatMessageSession
+import com.se122.interactivelearning.domain.model.SessionParticipant
 import com.se122.interactivelearning.utils.TokenManager
 import io.socket.client.IO
 import io.socket.client.Socket
+import org.json.JSONArray
 import org.json.JSONObject
 import java.net.URISyntaxException
 import javax.inject.Inject
@@ -16,7 +18,7 @@ import javax.inject.Singleton
 class SessionSocketManager @Inject constructor(
     tokenManager: TokenManager
 ): BaseSocketManager(tokenManager) {
-    override val namespaceUrl: String = "ws://192.168.1.6:3001/api/session"
+    override val namespaceUrl: String = "ws://192.168.1.42:3001/api/session"
 
     fun joinSession(sessionId: String) {
         emit("joinSession", sessionId)
@@ -73,7 +75,68 @@ class SessionSocketManager @Inject constructor(
         }
     }
 
+    fun onSessionInfoReceived(callback: (participants: List<SessionParticipant>) -> Unit) {
+        off("sessionInfo")
+        on("sessionInfo") { args ->
+            val data = args.getOrNull(0) as? JSONObject
+            val clients = data?.optJSONArray("currentClients")
+            callback(parseParticipants(clients))
+        }
+    }
+
+    fun onUserJoined(
+        callback: (participant: SessionParticipant, currentClients: List<SessionParticipant>?) -> Unit
+    ) {
+        off("userJoined")
+        on("userJoined") { args ->
+            val data = args.getOrNull(0) as? JSONObject
+            val participantId = data?.optString("id") ?: return@on
+            val participantName = data.optString("senderName", "")
+            val clients = data.optJSONArray("currentClients")
+            val participants = parseParticipants(clients)
+            callback(
+                SessionParticipant(participantId, participantName.ifBlank { participantId }),
+                participants.takeIf { it.isNotEmpty() }
+            )
+        }
+    }
+
+    fun onUserLeft(callback: (participantId: String) -> Unit) {
+        off("userLeft")
+        on("userLeft") { args ->
+            val data = args.getOrNull(0) as? JSONObject
+            val participantId = data?.optString("id") ?: return@on
+            callback(participantId)
+        }
+    }
+
     companion object {
         private const val TAG = "SessionSocketManager"
+    }
+
+    private fun parseParticipants(clients: JSONArray?): List<SessionParticipant> {
+        val participants = mutableListOf<SessionParticipant>()
+        if (clients == null) {
+            return participants
+        }
+        for (index in 0 until clients.length()) {
+            val item = clients.get(index)
+            when (item) {
+                is JSONObject -> {
+                    val id = item.optString("id")
+                    if (id.isNotBlank()) {
+                        val name = item.optString("senderName", id)
+                        participants.add(SessionParticipant(id, if (name.isBlank()) id else name))
+                    }
+                }
+                else -> {
+                    val id = clients.optString(index)
+                    if (id.isNotBlank()) {
+                        participants.add(SessionParticipant(id, id))
+                    }
+                }
+            }
+        }
+        return participants
     }
 }

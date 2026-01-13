@@ -2,6 +2,7 @@ package com.se122.interactivelearning.data.repository
 
 import com.se122.interactivelearning.data.remote.socket.session.SessionSocketManager
 import com.se122.interactivelearning.domain.model.ChatMessageSession
+import com.se122.interactivelearning.domain.model.SessionParticipant
 import com.se122.interactivelearning.domain.repository.SessionSocketRepository
 import javax.inject.Inject
 
@@ -26,6 +27,20 @@ class SessionSocketRepositoryImpl @Inject constructor(
 
     override fun onQuestionReceived(callback: (questionId: String) -> Unit) {
         sessionSocketManager.onQuestionReceived(callback)
+    }
+
+    override fun onSessionInfoReceived(callback: (participants: List<SessionParticipant>) -> Unit) {
+        sessionSocketManager.onSessionInfoReceived(callback)
+    }
+
+    override fun onUserJoined(
+        callback: (participant: SessionParticipant, currentClients: List<SessionParticipant>?) -> Unit
+    ) {
+        sessionSocketManager.onUserJoined(callback)
+    }
+
+    override fun onUserLeft(callback: (participantId: String) -> Unit) {
+        sessionSocketManager.onUserLeft(callback)
     }
 
     override fun sendMessage(sessionId: String, message: String) {

@@ -9,9 +9,14 @@ import com.se122.interactivelearning.data.remote.dto.ClassroomDetailsResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomStudentResponse
 import com.se122.interactivelearning.data.remote.dto.ClassroomWrapperResponse
 import com.se122.interactivelearning.data.remote.dto.Group
+import com.se122.interactivelearning.data.remote.dto.LessonDetailResponse
+import com.se122.interactivelearning.data.remote.dto.LessonResponse
 import com.se122.interactivelearning.data.remote.dto.MaterialResponse
 import com.se122.interactivelearning.data.remote.dto.MeetingResponse
+import com.se122.interactivelearning.data.remote.dto.QuizResponse
 import com.se122.interactivelearning.data.remote.dto.SessionResponse
+import com.se122.interactivelearning.data.remote.dto.SuggestionsResponse
+import com.se122.interactivelearning.data.remote.dto.TopicResponse
 import com.se122.interactivelearning.domain.repository.ClassroomRepository
 import javax.inject.Inject
 
@@ -51,6 +56,42 @@ class ClassroomRepositoryImpl @Inject constructor(
     override suspend fun getClassroomAssignments(id: String): ApiResult<PaginationResponse<AssignmentResponse>> {
         return safeApiCall {
             classroomApi.getClassroomAssignments(id)
+        }
+    }
+
+    override suspend fun getClassroomTopics(id: String): ApiResult<PaginationResponse<TopicResponse>> {
+        return safeApiCall {
+            classroomApi.getClassroomTopics(id)
+        }
+    }
+
+    override suspend fun getClassroomAISuggestions(id: String): ApiResult<SuggestionsResponse> {
+        return safeApiCall {
+            classroomApi.getClassroomAISuggestions(id)
+        }
+    }
+
+    override suspend fun getOverallAISuggestions(): ApiResult<SuggestionsResponse> {
+        return safeApiCall {
+            classroomApi.getOverallAISuggestions()
+        }
+    }
+
+    override suspend fun getTopicLessons(id: String): ApiResult<PaginationResponse<LessonResponse>> {
+        return safeApiCall {
+            classroomApi.getTopicLessons(id)
+        }
+    }
+
+    override suspend fun getLessonDetail(id: String): ApiResult<LessonDetailResponse> {
+        return safeApiCall {
+            classroomApi.getLessonDetail(id)
+        }
+    }
+
+    override suspend fun getLessonQuizzes(id: String): ApiResult<List<QuizResponse>> {
+        return safeApiCall {
+            classroomApi.getLessonQuizzes(id)
         }
     }
     override suspend fun joinClassroom(code: String): ApiResult<ClassroomStudentResponse> {

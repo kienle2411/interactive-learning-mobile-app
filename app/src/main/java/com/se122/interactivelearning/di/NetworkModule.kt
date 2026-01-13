@@ -2,7 +2,9 @@ package com.se122.interactivelearning.di
 
 import com.se122.interactivelearning.core.data.network.TokenAuthenticator
 import com.se122.interactivelearning.data.remote.api.AnswerApi
+import com.se122.interactivelearning.data.remote.api.AssignmentApi
 import com.se122.interactivelearning.data.remote.api.AuthApi
+import com.se122.interactivelearning.data.remote.api.ChatApi
 import com.se122.interactivelearning.data.remote.api.ClassroomApi
 import com.se122.interactivelearning.data.remote.api.FileApi
 import com.se122.interactivelearning.data.remote.api.MeetingApi
@@ -21,13 +23,14 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     @Provides
-    fun provideBaseUrl() = "http://192.168.1.6:3001/api/"
+    fun provideBaseUrl() = "http://192.168.1.42:3001/api/"
 
     @Provides
     @Singleton
@@ -50,7 +53,14 @@ object NetworkModule {
             }.build()
             chain.proceed(newRequest)
         }
-        return OkHttpClient.Builder().addInterceptor(loggingInterceptor).addInterceptor(tokenInterceptor).authenticator(tokenAuthenticator).build()
+        return OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .addInterceptor(loggingInterceptor)
+            .addInterceptor(tokenInterceptor)
+            .authenticator(tokenAuthenticator)
+            .build()
     }
 
     @Provides
@@ -111,5 +121,17 @@ object NetworkModule {
     @Singleton
     fun provideAnswerApi(retrofit: Retrofit): AnswerApi {
         return retrofit.create(AnswerApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAssignmentApi(retrofit: Retrofit): AssignmentApi {
+        return retrofit.create(AssignmentApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChatApi(retrofit: Retrofit): ChatApi {
+        return retrofit.create(ChatApi::class.java)
     }
 }
