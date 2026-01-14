@@ -25,7 +25,7 @@ class SessionSocketRepositoryImpl @Inject constructor(
         sessionSocketManager.onMessageReceived(callback)
     }
 
-    override fun onQuestionReceived(callback: (questionId: String) -> Unit) {
+    override fun onQuestionReceived(callback: (questionId: String, slideId: String?) -> Unit) {
         sessionSocketManager.onQuestionReceived(callback)
     }
 

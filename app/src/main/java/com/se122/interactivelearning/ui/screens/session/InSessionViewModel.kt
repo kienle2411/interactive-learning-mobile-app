@@ -16,6 +16,7 @@ import com.se122.interactivelearning.domain.repository.SessionSocketRepository
 import com.se122.interactivelearning.domain.usecase.answer.CreateAnswerUseCase
 import com.se122.interactivelearning.domain.usecase.question.GetQuestionUseCase
 import com.se122.interactivelearning.domain.usecase.session.GetSessionInformationUseCase
+import com.se122.interactivelearning.domain.usecase.session.GetSlideQuestionsUseCase
 import com.se122.interactivelearning.utils.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,7 @@ class InSessionViewModel @Inject constructor(
     private val sessionSocketRepository: SessionSocketRepository,
     private val getSessionInformationUseCase: GetSessionInformationUseCase,
     private val getQuestionUseCase: GetQuestionUseCase,
+    private val getSlideQuestionsUseCase: GetSlideQuestionsUseCase,
     private val createAnswerUseCase: CreateAnswerUseCase
 ): ViewModel() {
     private val _session = MutableStateFlow<ViewState<SessionResponse>>(ViewState.Loading)
@@ -129,9 +131,13 @@ class InSessionViewModel @Inject constructor(
     }
 
     fun observeQuestion() {
-        sessionSocketRepository.onQuestionReceived {
-            Log.d("InSessionViewModel", "Question received: $it")
-            getQuestion(it)
+        sessionSocketRepository.onQuestionReceived { questionId, slideId ->
+            Log.d("InSessionViewModel", "Question received: $questionId slideId: $slideId")
+            if (!slideId.isNullOrBlank()) {
+                getSlideQuestion(slideId, questionId)
+            } else {
+                getQuestion(questionId)
+            }
         }
     }
 
@@ -146,6 +152,31 @@ class InSessionViewModel @Inject constructor(
                 }
                 else -> {
 
+                }
+            }
+        }
+    }
+
+    fun getSlideQuestion(slidePageId: String, questionId: String) {
+        viewModelScope.launch {
+            _question.value = ViewState.Loading
+            when (val result = getSlideQuestionsUseCase(slidePageId)) {
+                is ApiResult.Success -> {
+                    val slideQuestions = result.data.slideQuestions
+                    val matched = slideQuestions.firstOrNull {
+                        (it.questionId == questionId || it.id == questionId) &&
+                            it.question.deletedAt == null
+                    }?.question ?: slideQuestions.firstOrNull {
+                        it.question.deletedAt == null
+                    }?.question
+                    if (matched != null) {
+                        _question.value = ViewState.Success(matched)
+                    } else {
+                        _question.value = ViewState.Idle
+                    }
+                }
+                else -> {
+                    _question.value = ViewState.Idle
                 }
             }
         }

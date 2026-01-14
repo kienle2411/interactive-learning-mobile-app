@@ -64,14 +64,14 @@ class SessionSocketManager @Inject constructor(
         }
     }
 
-    fun onQuestionReceived(callback: (questionId: String) -> Unit) {
+    fun onQuestionReceived(callback: (questionId: String, slideId: String?) -> Unit) {
         off("receiveQuestion")
         on("receiveQuestion") { args ->
             val data = args.getOrNull(0) as? JSONObject
-            val sessionId = data?.optString("sessionId")
             val questionId = data?.optString("questionId")
-            questionId?.let { callback(it) }
-            Log.d(TAG, "onQuestionReceived: $questionId")
+            val slideId = data?.optString("slideId")
+            questionId?.let { callback(it, slideId) }
+            Log.d(TAG, "onQuestionReceived: $questionId slideId: $slideId")
         }
     }
 

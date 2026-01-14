@@ -11,7 +11,7 @@ interface SessionSocketRepository {
     fun sendMessage(sessionId: String, message: String)
     fun onSlideReceived(callback: (slideUrl: String, slidePageId: String) -> Unit)
     fun onMessageReceived(callback: (chatMessage: ChatMessageSession) -> Unit)
-    fun onQuestionReceived(callback: (questionId: String) -> Unit)
+    fun onQuestionReceived(callback: (questionId: String, slideId: String?) -> Unit)
     fun onSessionInfoReceived(callback: (participants: List<SessionParticipant>) -> Unit)
     fun onUserJoined(
         callback: (participant: SessionParticipant, currentClients: List<SessionParticipant>?) -> Unit

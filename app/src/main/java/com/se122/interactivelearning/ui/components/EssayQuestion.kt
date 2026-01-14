@@ -32,7 +32,7 @@ fun EssayQuestion(
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Text(
-            text = questionData.content,
+            text = questionData.content.orEmpty(),
             style = MaterialTheme.typography.titleMedium
         )
         TextField(

@@ -71,7 +71,10 @@ fun InQuizScreen(
                             modifier = Modifier.weight(1f),
                             progress = {
                                 if (question is ViewState.Success) {
-                                    timeLeft.toFloat() / (question as ViewState.Success).data.timeLimit.toFloat()
+                                    val limit =
+                                        ((question as ViewState.Success).data.timeLimit ?: 0)
+                                            .coerceAtLeast(1)
+                                    timeLeft.toFloat() / limit.toFloat()
                                 } else {
                                     0f
                                 }

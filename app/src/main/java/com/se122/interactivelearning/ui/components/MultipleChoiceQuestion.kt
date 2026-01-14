@@ -49,17 +49,17 @@ fun MultipleChoiceQuestion(questionData: QuestionResponse, onQuestionAnswered: (
     var selectedOptionId by remember { mutableStateOf<String?>(null) }
     var submitted by remember { mutableStateOf(false) }
 
-    val visibleOptions = questionData.questionOption.filter { it.deletedAt == null }
+    val visibleOptions = questionData.options.filter { it.deletedAt == null }
 
     Column(modifier = Modifier.padding(16.dp)) {
-        Text(text = questionData.content, style = MaterialTheme.typography.titleLarge)
+        Text(text = questionData.content.orEmpty(), style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(8.dp))
         AssistChip(
             modifier = Modifier.align(Alignment.End),
             onClick = {},
             label = {
                 Text(
-                    text = "${questionData.score} points"
+                    text = "${questionData.score ?: 0} points"
                 )
             }
         )
@@ -80,7 +80,7 @@ fun MultipleChoiceQuestion(questionData: QuestionResponse, onQuestionAnswered: (
                     onClick = { if (!submitted) selectedOptionId = option.id }
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = option.option)
+                Text(text = option.content)
             }
         }
 

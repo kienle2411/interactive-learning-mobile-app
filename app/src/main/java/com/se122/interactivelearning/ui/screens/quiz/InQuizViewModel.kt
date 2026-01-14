@@ -71,7 +71,7 @@ class InQuizViewModel @Inject constructor(
                 is ApiResult.Success -> {
                     val question = result.data
                     _question.value = ViewState.Success(question)
-                    startCountdown(question.timeLimit)
+                    startCountdown(question.timeLimit ?: 0)
                     Log.i("InQuizViewModel", "getQuestion")
                 }
                 else -> {
