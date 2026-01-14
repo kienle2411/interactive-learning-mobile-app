@@ -53,6 +53,9 @@ import com.se122.interactivelearning.ui.components.ClassCard
 import com.se122.interactivelearning.ui.components.InputIcon
 import com.se122.interactivelearning.ui.components.PrimaryButton
 import com.se122.interactivelearning.R
+import com.eygraber.compose.placeholder.PlaceholderHighlight
+import com.eygraber.compose.placeholder.material3.placeholder
+import com.eygraber.compose.placeholder.material3.shimmer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -127,12 +130,18 @@ fun CourseScreen(
                 }
                 is ViewState.Idle -> {}
                 is ViewState.Loading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .wrapContentSize(Alignment.Center)
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        CircularProgressIndicator()
+                        items(3) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(5.dp)
+                            ) {
+                                PlaceholderCourseCard(modifier = Modifier.weight(1f))
+                                PlaceholderCourseCard(modifier = Modifier.weight(1f))
+                            }
+                        }
                     }
                 }
                 is ViewState.Success -> {
@@ -198,4 +207,17 @@ fun CourseScreen(
             )
         }
     }
+}
+
+@Composable
+private fun PlaceholderCourseCard(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .height(120.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .placeholder(
+                visible = true,
+                highlight = PlaceholderHighlight.shimmer()
+            )
+    )
 }

@@ -16,7 +16,7 @@ class QuizSocketManager @Inject constructor(
     tokenManager: TokenManager
 ): BaseSocketManager(tokenManager) {
 
-    override val namespaceUrl: String = "ws://192.168.1.42:3001/api/quiz"
+    override val namespaceUrl: String = "ws://192.168.1.8:3001/api/quiz"
 
     fun joinQuiz(quizId: String) {
         emit("joinQuiz", quizId)

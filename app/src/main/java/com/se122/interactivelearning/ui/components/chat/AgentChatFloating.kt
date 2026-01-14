@@ -7,14 +7,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -45,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 
 @Composable
 fun AgentChatFloating(
@@ -60,22 +65,27 @@ fun AgentChatFloating(
 ) {
     val configuration = LocalConfiguration.current
     val maxWidth = (configuration.screenWidthDp * 0.92f).dp
+    val maxHeight = (configuration.screenHeightDp * 0.6f).dp
     val listState = rememberLazyListState()
     var inputValue by remember { mutableStateOf("") }
 
-    LaunchedEffect(messages.size) {
-        if (messages.isNotEmpty()) {
-            listState.animateScrollToItem(messages.size - 1)
+    LaunchedEffect(messages.size, isSending) {
+        val itemCount = messages.size + if (isSending) 1 else 0
+        if (itemCount > 0) {
+            listState.animateScrollToItem(itemCount - 1)
         }
     }
 
-    Box(modifier = modifier) {
+    Box(modifier = modifier.fillMaxSize()) {
         AnimatedVisibility(visible = isOpen) {
             Card(
                 modifier = Modifier
                     .widthIn(min = 280.dp, max = maxWidth)
+                    .heightIn(max = maxHeight)
                     .wrapContentHeight()
-                    .imePadding(),
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+                    .windowInsetsPadding(WindowInsets.ime),
                 shape = RoundedCornerShape(18.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
@@ -127,11 +137,17 @@ fun AgentChatFloating(
                         state = listState,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(280.dp),
+                            .weight(1f, fill = true)
+                            .heightIn(min = 120.dp),
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         items(messages, key = { it.id }) { message ->
                             ChatBubble(message = message)
+                        }
+                        if (isSending) {
+                            item {
+                                LoadingChatBubble()
+                            }
                         }
                     }
 
@@ -173,27 +189,24 @@ fun AgentChatFloating(
                             )
                         }
                     }
-                    if (isSending) {
-                        Text(
-                            text = "Dang gui...",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
                 }
             }
         }
 
-        FloatingActionButton(
-            onClick = onToggle,
-            modifier = Modifier.align(Alignment.BottomEnd),
-            shape = CircleShape,
-            containerColor = MaterialTheme.colorScheme.primary
-        ) {
-            Icon(
-                imageVector = if (isOpen) Icons.Filled.Close else Icons.Filled.ChatBubbleOutline,
-                contentDescription = "Toggle chat"
-            )
+        if (!isOpen) {
+            FloatingActionButton(
+                onClick = onToggle,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ChatBubbleOutline,
+                    contentDescription = "Toggle chat"
+                )
+            }
         }
     }
 }
@@ -222,6 +235,34 @@ private fun ChatBubble(message: ChatUiMessage) {
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
                 }
+            )
+        }
+    }
+}
+
+@Composable
+private fun LoadingChatBubble() {
+    var dotCount by remember { mutableStateOf(0) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(400)
+            dotCount = (dotCount + 1) % 4
+        }
+    }
+    val dots = ".".repeat(dotCount)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant
+        ) {
+            Text(
+                text = "Đang suy nghĩ$dots",
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

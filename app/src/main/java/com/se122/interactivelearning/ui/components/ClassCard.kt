@@ -40,7 +40,7 @@ fun ClassCard(
             .background(Color.White)
     ) {
         Image(
-            painter = painterResource(id = R.drawable.classroom_card),
+            painter = painterResource(id = R.drawable.img_classroom_placeholder),
             contentDescription = "class-card",
             modifier = Modifier.clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
         )

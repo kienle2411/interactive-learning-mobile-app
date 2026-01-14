@@ -43,8 +43,8 @@ fun AssignmentCard(
         AssignmentStatus.ENDED -> Color(0xFF9F1D1D) to Color(0xFFFFEBEB)
     }
     val actionText = when (assignment.type) {
-        AssignmentType.QUIZ -> "Start"
-        AssignmentType.ASSIGNMENT -> "Do assignment"
+        AssignmentType.QUIZ -> if (assignment.isSubmitted) "View" else "Start"
+        AssignmentType.ASSIGNMENT -> if (assignment.isSubmitted) "View" else "Do assignment"
     }
 
     Card(
@@ -79,6 +79,20 @@ fun AssignmentCard(
                         .background(color = statusBg, shape = RoundedCornerShape(999.dp))
                         .padding(horizontal = 10.dp, vertical = 4.dp),
                     color = statusColor,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+            if (assignment.isSubmitted) {
+                Text(
+                    text = "Done",
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            shape = RoundedCornerShape(999.dp)
+                        )
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -136,7 +150,7 @@ fun AssignmentCard(
             ) {
                 Button(
                     onClick = { onClick(assignment) },
-                    enabled = assignment.isOngoing
+                    enabled = assignment.isOngoing || assignment.isSubmitted
                 ) {
                     Text(text = actionText)
                 }

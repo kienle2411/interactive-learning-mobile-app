@@ -8,12 +8,14 @@ import com.se122.interactivelearning.common.ViewState
 import com.se122.interactivelearning.data.remote.api.ApiResult
 import com.se122.interactivelearning.data.remote.dto.AssignmentAnswerRequest
 import com.se122.interactivelearning.data.remote.dto.AssignmentQuestionsResponse
+import com.se122.interactivelearning.data.remote.dto.ExplainQuestionResponse
 import com.se122.interactivelearning.data.remote.dto.SubmissionResponse
 import com.se122.interactivelearning.data.remote.dto.SubmitAssignmentRequest
 import com.se122.interactivelearning.domain.usecase.assignment.GetAssignmentSubmissionsUseCase
 import com.se122.interactivelearning.domain.usecase.assignment.GetAssignmentQuestionsUseCase
 import com.se122.interactivelearning.domain.usecase.assignment.SubmitAssignmentFilesUseCase
 import com.se122.interactivelearning.domain.usecase.assignment.SubmitAssignmentUseCase
+import com.se122.interactivelearning.domain.usecase.question.ExplainQuestionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +33,7 @@ class AssignmentDetailViewModel @Inject constructor(
     private val submitAssignmentUseCase: SubmitAssignmentUseCase,
     private val submitAssignmentFilesUseCase: SubmitAssignmentFilesUseCase,
     private val getAssignmentSubmissionsUseCase: GetAssignmentSubmissionsUseCase,
+    private val explainQuestionUseCase: ExplainQuestionUseCase,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
     private val _assignment = MutableStateFlow<ViewState<AssignmentQuestionsResponse>>(ViewState.Loading)
@@ -44,6 +47,10 @@ class AssignmentDetailViewModel @Inject constructor(
 
     private val _submissions = MutableStateFlow<ViewState<List<SubmissionResponse>>>(ViewState.Idle)
     val submissions = _submissions.asStateFlow()
+
+    private val _explanations =
+        MutableStateFlow<Map<String, ViewState<ExplainQuestionResponse>>>(emptyMap())
+    val explanations = _explanations.asStateFlow()
 
     fun loadAssignmentQuestions(id: String) {
         viewModelScope.launch {
@@ -135,6 +142,38 @@ class AssignmentDetailViewModel @Inject constructor(
 
     fun resetSubmitState() {
         _submitState.value = ViewState.Idle
+    }
+
+    fun explainQuestion(questionId: String, studentAnswer: String?) {
+        val existing = _explanations.value[questionId]
+        if (existing is ViewState.Success) {
+            return
+        }
+        viewModelScope.launch {
+            _explanations.update { current ->
+                current + (questionId to ViewState.Loading)
+            }
+            val request = com.se122.interactivelearning.data.remote.dto.ExplainQuestionRequest(
+                studentAnswer = studentAnswer
+            )
+            when (val result = explainQuestionUseCase(questionId, request)) {
+                is ApiResult.Success -> {
+                    _explanations.update { current ->
+                        current + (questionId to ViewState.Success(result.data))
+                    }
+                }
+                is ApiResult.Error -> {
+                    _explanations.update { current ->
+                        current + (questionId to ViewState.Error(result.message))
+                    }
+                }
+                is ApiResult.Exception -> {
+                    _explanations.update { current ->
+                        current + (questionId to ViewState.Error(result.e.message))
+                    }
+                }
+            }
+        }
     }
 
     private fun buildFileParts(files: List<Uri>): List<MultipartBody.Part> {

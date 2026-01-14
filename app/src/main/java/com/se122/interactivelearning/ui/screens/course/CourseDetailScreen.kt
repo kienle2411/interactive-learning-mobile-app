@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -54,6 +55,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.se122.interactivelearning.common.ViewState
 import com.se122.interactivelearning.ui.theme.GraySecondary
@@ -62,6 +64,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
+import androidx.compose.ui.res.painterResource
+import com.se122.interactivelearning.R
 import com.se122.interactivelearning.ui.components.AssignmentCard
 import com.se122.interactivelearning.ui.components.MaterialCard
 import com.se122.interactivelearning.ui.components.SessionCard
@@ -70,6 +74,7 @@ import com.se122.interactivelearning.ui.components.chat.AgentChatFloating
 import com.se122.interactivelearning.ui.components.chat.AgentChatViewModel
 import com.se122.interactivelearning.ui.components.chat.ChatContext
 import com.se122.interactivelearning.ui.components.chat.ChatScopeType
+import com.se122.interactivelearning.data.remote.dto.SuggestedActionResponse
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -81,7 +86,8 @@ fun CourseDetailScreen(
     onBackClick: () -> Unit,
     onJoinSessionClick: (String) -> Unit,
     onLessonClick: (String) -> Unit,
-    onAssignmentClick: (String) -> Unit
+    onAssignmentClick: (String) -> Unit,
+    onSuggestionClick: (SuggestedActionResponse) -> Unit
 ) {
     val classroomDetails by viewModel.classroomDetails.collectAsState()
     val classroomStudents by viewModel.classroomStudents.collectAsState()
@@ -91,6 +97,7 @@ fun CourseDetailScreen(
     val classroomAssignments by viewModel.classroomAssignments.collectAsState()
     val classroomTopics by viewModel.classroomTopics.collectAsState()
     val topicLessons by viewModel.topicLessons.collectAsState()
+    val classroomSuggestions by viewModel.classroomSuggestions.collectAsState()
     val chatState by chatViewModel.uiState.collectAsState()
     var showChat by rememberSaveable { mutableStateOf(false) }
 
@@ -121,6 +128,7 @@ fun CourseDetailScreen(
         viewModel.loadSessions(id)
         viewModel.loadAssignments(id)
         viewModel.loadTopics(id)
+        viewModel.loadClassroomSuggestions(id)
     }
 
     LaunchedEffect(id, classroomDetails) {
@@ -588,32 +596,63 @@ fun CourseDetailScreen(
                                     when (classroomStudents) {
                                         is ViewState.Success -> {
                                             val classroomStudents = (classroomStudents as ViewState.Success).data
-                                            Column(
-                                                modifier = Modifier.fillMaxSize().padding(horizontal = 5.dp),
+                                            var membersExpanded by rememberSaveable { mutableStateOf(false) }
+                                            val sortedStudents = classroomStudents.sortedByDescending { it.score ?: 0 }
+                                            LazyColumn(
+                                                state = listStates[it],
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .padding(horizontal = 5.dp),
                                                 verticalArrangement = Arrangement.spacedBy(10.dp)
                                             ) {
-                                                Text(
-                                                    text = classroomDetails.name,
-                                                    style = MaterialTheme.typography.titleMedium
-                                                )
-                                                Text(
-                                                    text = classroomDetails.description ?: "",
-                                                    style = MaterialTheme.typography.bodySmall
-                                                )
-                                                HorizontalDivider()
-                                                LazyColumn(
-                                                    state = listStates[it],
-                                                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                                                    modifier = Modifier.fillMaxSize()
-                                                ) {
-                                                    item {
+                                                item {
+                                                    Text(
+                                                        text = classroomDetails.name,
+                                                        style = MaterialTheme.typography.titleMedium
+                                                    )
+                                                }
+                                                item {
+                                                    Text(
+                                                        text = classroomDetails.description ?: "",
+                                                        style = MaterialTheme.typography.bodySmall
+                                                    )
+                                                }
+                                                item {
+                                                    HorizontalDivider()
+                                                }
+                                                item {
+                                                    ClassroomSuggestionsSection(
+                                                        suggestionsState = classroomSuggestions,
+                                                        onSuggestionClick = onSuggestionClick
+                                                    )
+                                                }
+                                                item {
+                                                    Row(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .clickable {
+                                                                membersExpanded = !membersExpanded
+                                                            },
+                                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
                                                         Text(
                                                             text = "Participants",
                                                             style = MaterialTheme.typography.titleMedium
                                                         )
+                                                        Icon(
+                                                            imageVector = if (membersExpanded) {
+                                                                Icons.Default.KeyboardArrowUp
+                                                            } else {
+                                                                Icons.Default.KeyboardArrowDown
+                                                            },
+                                                            contentDescription = "Toggle members"
+                                                        )
                                                     }
+                                                }
+                                                if (membersExpanded) {
                                                     items(
-                                                        items = classroomStudents,
+                                                        items = sortedStudents,
                                                         key = { item -> item.id }
                                                     ) {
                                                         StudentCard(
@@ -670,5 +709,79 @@ fun CourseDetailScreen(
                 modifier = Modifier.fillMaxSize()
             )
         }
+    }
+}
+
+@Composable
+private fun ClassroomSuggestionsSection(
+    suggestionsState: ViewState<com.se122.interactivelearning.data.remote.dto.SuggestionsResponse>,
+    onSuggestionClick: (SuggestedActionResponse) -> Unit
+) {
+    when (suggestionsState) {
+        is ViewState.Loading -> {
+            Text(
+                text = "Suggestions",
+                style = MaterialTheme.typography.titleMedium
+            )
+            CircularProgressIndicator(modifier = Modifier.size(18.dp))
+        }
+        is ViewState.Success -> {
+            val suggestions = suggestionsState.data.suggestions
+            if (suggestions.isNotEmpty()) {
+                Text(
+                    text = "Suggestions",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    suggestions.forEach { suggestion ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onSuggestionClick(suggestion) },
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Column {
+                                if (suggestion.type == "LESSON") {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.img_lesson_placeholder),
+                                        contentDescription = "Lesson placeholder",
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(180.dp)
+                                            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                                Column(
+                                    modifier = Modifier.padding(12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Text(
+                                        text = suggestion.title,
+                                        style = MaterialTheme.typography.titleSmall
+                                    )
+                                    suggestion.subtitle?.let { subtitle ->
+                                        Text(
+                                            text = subtitle,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = GraySecondary
+                                        )
+                                    }
+                                    Text(
+                                        text = suggestion.reason,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                HorizontalDivider()
+            }
+        }
+        else -> {}
     }
 }

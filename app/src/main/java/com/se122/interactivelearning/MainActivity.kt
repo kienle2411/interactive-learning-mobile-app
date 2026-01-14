@@ -65,7 +65,8 @@ fun MyApplication() {
         NavRoutes.COURSE,
         NavRoutes.PROFILE,
         NavRoutes.NOTIFICATION,
-        NavRoutes.QUIZZES
+        NavRoutes.QUIZZES,
+        NavRoutes.SUGGESTIONS
     )
 
     LaunchedEffect(shouldLogout) {

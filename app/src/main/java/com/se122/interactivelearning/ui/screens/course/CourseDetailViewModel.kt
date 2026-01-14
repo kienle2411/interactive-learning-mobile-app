@@ -12,10 +12,14 @@ import com.se122.interactivelearning.data.remote.dto.ClassroomStudentResponse
 import com.se122.interactivelearning.data.remote.dto.LessonResponse
 import com.se122.interactivelearning.data.remote.dto.MaterialResponse
 import com.se122.interactivelearning.data.remote.dto.SessionResponse
+import com.se122.interactivelearning.data.remote.dto.SubmissionStatus
 import com.se122.interactivelearning.data.remote.dto.TopicResponse
+import com.se122.interactivelearning.data.remote.dto.SuggestionsResponse
+import com.se122.interactivelearning.domain.usecase.assignment.GetAssignmentSubmissionsUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomAssignmentsUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomDetailUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomMaterialsUseCase
+import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomAISuggestionsUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomSessionsUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomStudentsUseCase
 import com.se122.interactivelearning.domain.usecase.classroom.GetClassroomTopicsUseCase
@@ -26,6 +30,9 @@ import com.se122.interactivelearning.ui.model.AssignmentStatus
 import com.se122.interactivelearning.ui.model.SessionUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -42,6 +49,8 @@ class CourseDetailViewModel @Inject constructor(
     private val getFileDownloadLinkUseCase: GetFileDownloadLinkUseCase,
     private val getClassroomSessionsUseCase: GetClassroomSessionsUseCase,
     private val getClassroomAssignmentsUseCase: GetClassroomAssignmentsUseCase,
+    private val getAssignmentSubmissionsUseCase: GetAssignmentSubmissionsUseCase,
+    private val getClassroomAISuggestionsUseCase: GetClassroomAISuggestionsUseCase,
     private val getClassroomTopicsUseCase: GetClassroomTopicsUseCase,
     private val getTopicLessonsUseCase: GetTopicLessonsUseCase,
 ): ViewModel() {
@@ -68,6 +77,10 @@ class CourseDetailViewModel @Inject constructor(
 
     private val _topicLessons = MutableStateFlow<Map<String, ViewState<List<LessonResponse>>>>(emptyMap())
     val topicLessons = _topicLessons.asStateFlow()
+
+    private val _classroomSuggestions =
+        MutableStateFlow<ViewState<SuggestionsResponse>>(ViewState.Idle)
+    val classroomSuggestions = _classroomSuggestions.asStateFlow()
 
     init {
 
@@ -161,8 +174,9 @@ class CourseDetailViewModel @Inject constructor(
             _classroomAssignments.value = ViewState.Loading
             when (val result = getClassroomAssignmentsUseCase(id)) {
                 is ApiResult.Success -> {
+                    val submissionMap = getSubmissionStatus(result.data.data)
                     val items = withContext(Dispatchers.Default) {
-                        mapAssignments(result.data.data)
+                        mapAssignments(result.data.data, submissionMap)
                     }
                     _classroomAssignments.value = ViewState.Success(items)
                 }
@@ -225,6 +239,17 @@ class CourseDetailViewModel @Inject constructor(
         }
     }
 
+    fun loadClassroomSuggestions(id: String) {
+        viewModelScope.launch {
+            _classroomSuggestions.value = ViewState.Loading
+            when (val result = getClassroomAISuggestionsUseCase(id)) {
+                is ApiResult.Success -> _classroomSuggestions.value = ViewState.Success(result.data)
+                is ApiResult.Error -> _classroomSuggestions.value = Error(result.message)
+                is ApiResult.Exception -> _classroomSuggestions.value = Error(result.e.message)
+            }
+        }
+    }
+
     fun loadLessonsForTopic(topicId: String) {
         viewModelScope.launch {
             _topicLessons.value = _topicLessons.value + (topicId to ViewState.Loading)
@@ -263,13 +288,19 @@ class CourseDetailViewModel @Inject constructor(
         }
     }
 
-    private fun mapAssignments(items: List<AssignmentResponse>): List<AssignmentUi> {
+    private fun mapAssignments(
+        items: List<AssignmentResponse>,
+        submissionMap: Map<String, Boolean>
+    ): List<AssignmentUi> {
         val now = ZonedDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy")
         return items.map { assignment ->
             val start = ZonedDateTime.parse(assignment.startTime, DateTimeFormatter.ISO_DATE_TIME)
             val due = ZonedDateTime.parse(assignment.dueTime, DateTimeFormatter.ISO_DATE_TIME)
             val isOngoing = now.isAfter(start) && now.isBefore(due)
+            val isSubmitted = submissionMap[assignment.id] ?: assignment.submission?.any {
+                it.status == SubmissionStatus.SUBMITTED || it.status == SubmissionStatus.GRADED
+            } == true
             val status = if (isOngoing) {
                 AssignmentStatus.ONGOING
             } else if (due.isBefore(now)) {
@@ -289,10 +320,27 @@ class CourseDetailViewModel @Inject constructor(
                 statusText = statusText,
                 status = status,
                 isOngoing = isOngoing,
+                isSubmitted = isSubmitted,
                 startText = formatter.format(start),
                 dueText = formatter.format(due),
                 type = assignment.type,
             )
         }
+    }
+
+    private suspend fun getSubmissionStatus(
+        assignments: List<AssignmentResponse>
+    ): Map<String, Boolean> = coroutineScope {
+        assignments.map { assignment ->
+            async {
+                val submitted = when (val result = getAssignmentSubmissionsUseCase(assignment.id)) {
+                    is ApiResult.Success -> result.data.any {
+                        it.status == SubmissionStatus.SUBMITTED || it.status == SubmissionStatus.GRADED
+                    }
+                    else -> false
+                }
+                assignment.id to submitted
+            }
+        }.awaitAll().toMap()
     }
 }

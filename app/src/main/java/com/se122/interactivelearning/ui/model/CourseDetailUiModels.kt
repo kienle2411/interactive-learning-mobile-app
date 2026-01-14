@@ -18,6 +18,7 @@ data class AssignmentUi(
     val statusText: String,
     val status: AssignmentStatus,
     val isOngoing: Boolean,
+    val isSubmitted: Boolean,
     val startText: String,
     val dueText: String,
     val type: AssignmentType,

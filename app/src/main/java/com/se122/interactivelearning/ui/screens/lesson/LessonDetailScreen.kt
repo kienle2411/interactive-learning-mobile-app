@@ -3,6 +3,7 @@ package com.se122.interactivelearning.ui.screens.lesson
 import android.annotation.SuppressLint
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,6 +56,7 @@ fun LessonDetailScreen(
 ) {
     val lessonDetail by viewModel.lessonDetail.collectAsState()
     val lessonQuizzes by viewModel.lessonQuizzes.collectAsState()
+    val quizCompletion by viewModel.quizCompletion.collectAsState()
     val chatState by chatViewModel.uiState.collectAsState()
     var showChat by rememberSaveable { mutableStateOf(false) }
 
@@ -175,6 +177,7 @@ fun LessonDetailScreen(
                                         items = quizzes,
                                         key = { it.id }
                                     ) { quiz ->
+                                        val isDone = quizCompletion[quiz.id] == true
                                         Card(
                                             modifier = Modifier
                                                 .fillMaxWidth(),
@@ -185,10 +188,39 @@ fun LessonDetailScreen(
                                             Column(
                                                 modifier = Modifier.padding(12.dp)
                                             ) {
-                                                Text(
-                                                    text = quiz.title,
-                                                    style = MaterialTheme.typography.bodyMedium
-                                                )
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Text(
+                                                        text = quiz.title,
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        modifier = Modifier.weight(1f)
+                                                    )
+                                                    val statusText = if (isDone) "Done" else "Not done"
+                                                    val statusBg = if (isDone) {
+                                                        MaterialTheme.colorScheme.secondaryContainer
+                                                    } else {
+                                                        MaterialTheme.colorScheme.surfaceVariant
+                                                    }
+                                                    val statusColor = if (isDone) {
+                                                        MaterialTheme.colorScheme.onSecondaryContainer
+                                                    } else {
+                                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                                    }
+                                                    Text(
+                                                        text = statusText,
+                                                        modifier = Modifier
+                                                            .background(
+                                                                color = statusBg,
+                                                                shape = RoundedCornerShape(999.dp)
+                                                            )
+                                                            .padding(horizontal = 10.dp, vertical = 4.dp),
+                                                        color = statusColor,
+                                                        style = MaterialTheme.typography.labelMedium
+                                                    )
+                                                }
                                                 if (!quiz.description.isNullOrBlank()) {
                                                     Text(
                                                         text = quiz.description ?: "",

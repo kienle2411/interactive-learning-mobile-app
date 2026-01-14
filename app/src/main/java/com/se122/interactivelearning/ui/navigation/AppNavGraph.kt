@@ -38,11 +38,11 @@ import com.se122.interactivelearning.ui.screens.meeting.MeetingSharedViewModel
 import com.se122.interactivelearning.ui.screens.notification.NotificationScreen
 import com.se122.interactivelearning.ui.screens.profile.EditProfileScreen
 import com.se122.interactivelearning.ui.screens.profile.ProfileScreen
-import com.se122.interactivelearning.ui.screens.quiz.InQuizScreen
-import com.se122.interactivelearning.ui.screens.quiz.QuizJoinScreen
+import com.se122.interactivelearning.ui.screens.quiz.QuizAttemptScreen
 import com.se122.interactivelearning.ui.screens.quiz.QuizListScreen
 import com.se122.interactivelearning.ui.screens.quiz.QuizSummaryScreen
 import com.se122.interactivelearning.ui.screens.session.InSessionScreen
+import com.se122.interactivelearning.ui.screens.suggestion.SuggestionsScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -56,10 +56,7 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
         ) {
             HomeScreen(
                 onQuizzesClick = {
-                    navController.navigate("quizzes")
-                },
-                onJoinMeetingClick = {
-                    navController.navigate("meeting_join/${it}")
+                    navController.navigate("suggestions")
                 },
                 onJoinSessionClick = { sessionId ->
                     navController.navigate("in_session/${sessionId}")
@@ -166,6 +163,14 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
                 },
                 onAssignmentClick = { assignmentId ->
                     navController.navigate("assignment_detail/${assignmentId}")
+                },
+                onSuggestionClick = { suggestion ->
+                    when (suggestion.type) {
+                        "LESSON" -> navController.navigate("lesson_detail/${suggestion.targetId}")
+                        "QUIZ" -> navController.navigate("quiz_join/${suggestion.targetId}")
+                        "ASSIGNMENT" -> navController.navigate("assignment_detail/${suggestion.targetId}")
+                        else -> {}
+                    }
                 }
             )
         }
@@ -246,27 +251,12 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
             route = NavRoutes.QUIZ_JOIN
         ) { backStackEntry ->
             val quizId = backStackEntry.arguments?.getString("id")
-            QuizJoinScreen(
+            QuizAttemptScreen(
                 quizId = quizId.toString(),
-                onJoinClick = {},
                 onBackClick = {
                     navController.popBackStack()
                 },
-                onStart = {
-                    navController.navigate("in_quiz/${quizId}")
-                }
-            )
-        }
-        composable(
-            route = NavRoutes.IN_QUIZ
-        ) { backStackEntry ->
-            val quizId = backStackEntry.arguments?.getString("id")
-            InQuizScreen(
-                quizId = quizId.toString(),
-                onBackClick = {},
-                onEndedQuiz = {
-                    navController.navigate("quiz_summary")
-                }
+                onSubmitted = {}
             )
         }
         composable(
@@ -275,6 +265,20 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier?) {
             QuizListScreen(
                 onJoin = {
                     navController.navigate("quiz_join/${it}")
+                }
+            )
+        }
+        composable(
+            route = NavRoutes.SUGGESTIONS
+        ) {
+            SuggestionsScreen(
+                onSuggestionClick = { suggestion ->
+                    when (suggestion.type) {
+                        "LESSON" -> navController.navigate("lesson_detail/${suggestion.targetId}")
+                        "QUIZ" -> navController.navigate("quiz_join/${suggestion.targetId}")
+                        "ASSIGNMENT" -> navController.navigate("assignment_detail/${suggestion.targetId}")
+                        else -> {}
+                    }
                 }
             )
         }

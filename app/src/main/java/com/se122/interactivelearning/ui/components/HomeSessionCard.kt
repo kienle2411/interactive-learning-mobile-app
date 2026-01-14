@@ -59,7 +59,7 @@ fun HomeSessionCard(
     ) {
         Column {
             Image(
-                painter = painterResource(id = R.drawable.session_pic),
+                painter = painterResource(id = R.drawable.img_session_placeholder),
                 contentDescription = "Session Image",
                 modifier = Modifier
                     .fillMaxWidth()

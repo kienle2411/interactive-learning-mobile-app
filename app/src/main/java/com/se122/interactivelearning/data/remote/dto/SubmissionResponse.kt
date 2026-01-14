@@ -14,7 +14,8 @@ data class SubmissionResponse(
     val student: StudentResponse,
     val fileId: String?,
     val file: FileResponse?,
-    val submissionFile: List<SubmissionFile>?
+    val submissionFile: List<SubmissionFile>?,
+    val answers: List<AssignmentAnswerResponse>?
 )
 
 enum class SubmissionStatus {
@@ -29,4 +30,31 @@ data class SubmissionFile(
     val submission: SubmissionResponse,
     val fileId: String,
     val file: FileResponse
+)
+
+data class AssignmentAnswerResponse(
+    val id: String,
+    val submissionId: String,
+    val questionId: String,
+    val selectedOptionId: String?,
+    val textAnswer: String?,
+    val fileId: String?,
+    val isCorrect: Boolean?,
+    val timeSpent: Int?,
+    val score: Int?,
+    val feedback: String?,
+    val question: AssignmentAnswerQuestion
+)
+
+data class AssignmentAnswerQuestion(
+    val id: String,
+    val content: String?,
+    val type: String,
+    val options: List<AssignmentAnswerOption>
+)
+
+data class AssignmentAnswerOption(
+    val id: String,
+    val content: String,
+    val isCorrect: Boolean
 )
